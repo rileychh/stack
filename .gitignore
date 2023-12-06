@@ -5,3 +5,4 @@ MDK-ARM/RTE/
 MDK-ARM/stack/
 MDK-ARM/*.uvguix*
 MDK-ARM/*.lst
+MDK-ARM/*.scvd
