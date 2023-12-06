@@ -1,0 +1,47 @@
+// AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
+//
+// PIO Unified Debugger
+//
+// Documentation: https://docs.platformio.org/page/plus/debugging.html
+// Configuration: https://docs.platformio.org/page/projectconf/section_env_debug.html
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug",
+            "executable": "C:/Users/riley/Desktop/stack/.pio/build/eval_f103ze/firmware.elf",
+            "projectEnvName": "eval_f103ze",
+            "toolchainBinDir": "C:/Users/riley/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "C:/Users/riley/.platformio/platforms/ststm32/misc/svd/STM32F107xx.svd",
+            "preLaunchTask": {
+                "type": "PlatformIO",
+                "task": "Pre-Debug"
+            }
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (skip Pre-Debug)",
+            "executable": "C:/Users/riley/Desktop/stack/.pio/build/eval_f103ze/firmware.elf",
+            "projectEnvName": "eval_f103ze",
+            "toolchainBinDir": "C:/Users/riley/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "C:/Users/riley/.platformio/platforms/ststm32/misc/svd/STM32F107xx.svd"
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (without uploading)",
+            "executable": "C:/Users/riley/Desktop/stack/.pio/build/eval_f103ze/firmware.elf",
+            "projectEnvName": "eval_f103ze",
+            "toolchainBinDir": "C:/Users/riley/.platformio/packages/toolchain-gccarmnoneeabi/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "svdPath": "C:/Users/riley/.platformio/platforms/ststm32/misc/svd/STM32F107xx.svd",
+            "loadMode": "manual"
+        }
+    ]
+}
