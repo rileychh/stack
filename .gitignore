@@ -1,8 +1,1 @@
-.pio
-
-MDK-ARM/DebugConfig/
-MDK-ARM/RTE/
-MDK-ARM/stack/
-MDK-ARM/*.uvguix*
-MDK-ARM/*.lst
-MDK-ARM/*.scvd
+/cmake-build-debug-stm32/

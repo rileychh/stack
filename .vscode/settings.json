@@ -1,9 +1,0 @@
-{
-  "cmake.configureOnOpen": false,
-  "files.associations": {
-    "*.css": "postcss",
-    "*.env": "ini",
-    "*.asm": "a51",
-    "stm32f1xx_hal_sram.h": "c"
-  }
-}
