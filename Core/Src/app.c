@@ -7,13 +7,13 @@
 extern UART_HandleTypeDef huart1;
 
 const char *GAME_BANNER =
-  CRLF
-  "                 _|_|_|    _|                          _|      " CRLF
-  "               _|        _|_|_|_|    _|_|_|    _|_|_|  _|  _|  " CRLF
-  "                 _|_|      _|      _|    _|  _|        _|_|    " CRLF
-  "                     _|    _|      _|    _|  _|        _|  _|  " CRLF
-  "               _|_|_|        _|_|    _|_|_|    _|_|_|  _|    _|" CRLF
-  "                 Copyright © 2023 Stack for STM32 Developers   " CRLF;
+  "\r\n"
+  "                 _|_|_|    _|                          _|      \r\n"
+  "               _|        _|_|_|_|    _|_|_|    _|_|_|  _|  _|  \r\n"
+  "                 _|_|      _|      _|    _|  _|        _|_|    \r\n"
+  "                     _|    _|      _|    _|  _|        _|  _|  \r\n"
+  "               _|_|_|        _|_|    _|_|_|    _|_|_|  _|    _|\r\n"
+  "                 Copyright © 2023 Stack for STM32 Developers   \r\n";
 
 void setup() {
   char *greeting = "Hello, world!";
@@ -22,16 +22,10 @@ void setup() {
   LCD_DrawString(0, 0, greeting, strlen(greeting));
   puts(GAME_BANNER);
 
-  printf("Enter a character: ");
-  char ch = '&';
-  HAL_StatusTypeDef status = HAL_UART_Receive_IT(&huart1, (uint8_t *)&ch, 1);
-  printf(
-    CRLF
-    "You entered: %c" CRLF
-    "HAL_UART_Receive_IT status: %x" CRLF,
-    ch,
-    status
-  );
+  char s[100];
+  printf("Enter a string: ");
+  scanf("%s", s);
+  printf("\r\nYou entered: %s\r\n", s);
 }
 
 void loop() {
