@@ -1,4 +1,10 @@
-/cmake-build-debug-stm32/
+# Generated project files from CLion
 /.idea
 !/.idea/runConfigurations/
+/cmake-build-debug-stm32/
+/CMakeLists.txt
+
+# Generated project files from STM32CubeMX
 /.mxproject
+/.cproject
+/.project
