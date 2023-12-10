@@ -3,6 +3,7 @@
 !/.idea/runConfigurations/
 /cmake-build-debug-stm32/
 /CMakeLists.txt
+/CMakeLists_template.txt
 
 # Generated project files from STM32CubeMX
 /.mxproject
