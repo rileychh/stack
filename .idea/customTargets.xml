@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="a5e7f2a5-eab5-4fac-b79d-ac5f2ef54578" name="uVision-STM32" defaultType="TOOL">
+      <configuration id="91bf759f-db72-4e5a-b1e8-ea8dd496bebf" name="uVision-STM32" toolchainName="STM32">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_Keil uVision Build" />
+        </build>
+        <clean type="TOOL">
+          <tool actionId="Tool_External Tools_Keil uVision Clean" />
+        </clean>
+      </configuration>
+    </target>
+  </component>
+</project>

@@ -1,6 +1,9 @@
 # Generated project files from CLion
-/.idea
+/.idea/*
 !/.idea/runConfigurations/
+!/.idea/tools/
+!/.idea/customTargets.xml
+!/.idea/cmake.xml
 /cmake-build-debug-stm32/
 /CMakeLists.txt
 /CMakeLists_template.txt

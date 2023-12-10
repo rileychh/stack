@@ -1,0 +1,16 @@
+<toolSet name="External Tools">
+  <tool name="Keil uVision Build" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="false" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="C:\Keil_v5\UV4\UV4.exe" />
+      <option name="PARAMETERS" value="-b $ProjectName$.uvprojx -o build.log" />
+      <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/MDK-ARM" />
+    </exec>
+  </tool>
+  <tool name="Keil uVision Clean" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="false" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="C:\Keil_v5\UV4\UV4.exe" />
+      <option name="PARAMETERS" value="-c $ProjectName$.uvprojx -o clean.log" />
+      <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/MDK-ARM" />
+    </exec>
+  </tool>
+</toolSet>
