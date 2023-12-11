@@ -18,7 +18,6 @@ const char *GAME_BANNER =
 void setup() {
   char *greeting = "Hello, world!";
   LCD_Init();
-  LCD_Clear();
   LCD_DrawString(0, 0, greeting, strlen(greeting));
   puts(GAME_BANNER);
 

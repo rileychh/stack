@@ -319,6 +319,7 @@ int LCD_DrawString(unsigned char Xpage, unsigned char YCol, char *c, unsigned ch
     return 1;
   }
 }
+
 void delay(void) {
   volatile unsigned char i = 0x8;
   while (i--) {
@@ -345,7 +346,7 @@ void power_delay(void) {
  * Output         : None
  * Return         : None
  *******************************************************************************/
-void STM3210E_LCD_Init(void) {
+void LCD_Init(void) {
   /* Configure the LCD Control pins --------------------------------------------*/
   LCD_CtrlLinesConfig();
 
@@ -390,7 +391,7 @@ void STM3210E_LCD_Init(void) {
   LCD_Command = Set_ColL_Addr_X | 0x0;
   delay();
 
-  LCD_Command = Display_On; //
+  LCD_Command = Display_On;
   delay();
 }
 
@@ -475,7 +476,7 @@ void LCD_Reset_Cursor(void) {
 * Return         : None
 *******************************************************************************/
 signed char x_p;
-void LCD_Clr_Cursor(signed char x) {
+void LCD_Clr_Cursor() {
   unsigned char i = 16;
   unsigned char data = 0x00;
 
@@ -731,9 +732,4 @@ void LCD_FSMCConfig(void) {
   /* BANK 4 (of NOR/SRAM Bank 1~4) is enabled */
 
   // FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM4, ENABLE);
-}
-void LCD_Init(void) {
-  STM3210E_LCD_Init();
-
-  LCD_Draw_ST_Logo();
 }

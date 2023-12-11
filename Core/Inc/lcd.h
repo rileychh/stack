@@ -32,7 +32,6 @@
 #define LCD_Data *((volatile unsigned char *)0x6c000001)    // A0=1 -- data
 
 void LCD_Init(void);
-void STM3210E_LCD_Init(void);
 void LCD_Clear(void);
 
 void LCD_DrawChar(unsigned char Xpos, unsigned char Ypos, unsigned char offset);
@@ -51,6 +50,6 @@ void power_delay(void);
 
 void LCD_Draw_ST_Logo(void);
 void LCD_Reset_Cursor(void);
-void LCD_Clr_Cursor(signed char x);
+void LCD_Clr_Cursor(void);
 void LCD_Set_Cursor(signed char x);
 #endif /* __LCD_H */
