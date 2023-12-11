@@ -3,5 +3,6 @@
 
 void setup(void);
 void loop(void);
+void on_tim6(void);
 
 #endif // !APP_H
