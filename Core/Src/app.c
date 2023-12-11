@@ -5,6 +5,7 @@
 #include <string.h>
 
 extern UART_HandleTypeDef huart1;
+extern ADC_HandleTypeDef hadc1;
 
 const char *GAME_BANNER =
   "\r\n"
@@ -29,5 +30,11 @@ void setup() {
 
 void loop() {
   HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+
+  HAL_ADC_Start(&hadc1);
+  uint32_t adc_value = HAL_ADC_GetValue(&hadc1);
+  HAL_ADC_Stop(&hadc1);
+  printf("ADC value: %lu\r\n", adc_value);
+
   HAL_Delay(500);
 }
