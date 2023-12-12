@@ -218,9 +218,8 @@ unsigned char ST_LOGO_TABLE[] = {
 };
 // clang-format on
 
-void LCD_Draw_ST_Logo() {
+void LCD_draw_fb(unsigned char *fb) {
   unsigned char i, j;
-  unsigned char *p = ST_LOGO_TABLE;
 
   LCD_Command = COM_Scan_Dir_Reverse;
   LCD_Command = Set_Start_Line_X | 0x0;
@@ -235,15 +234,18 @@ void LCD_Draw_ST_Logo() {
     LCD_Command = Set_ColL_Addr_X | 0x0;
     delay();
 
-    j = 128;
-    while (j--) {
-      LCD_Data = *p++;
       delay();
+    for (j = 0; j < 128; j++) {
+      LCD_Data = *fb++;
     }
   }
+}
+
 /**
  * @brief Draws a ST logo
  */
+void LCD_Draw_ST_Logo() {
+  LCD_draw_fb(ST_LOGO_TABLE);
 }
 
 /**

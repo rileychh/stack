@@ -34,6 +34,7 @@
 void LCD_Init(void);
 void LCD_Clear(void);
 
+void LCD_draw_fb(unsigned char *fb);
 void LCD_DrawChar(unsigned char Xpos, unsigned char Ypos, unsigned char offset);
 int LCD_DrawString(unsigned char Xpos, unsigned char Ypos, char *c, unsigned char length);
 
