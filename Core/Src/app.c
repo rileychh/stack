@@ -17,7 +17,7 @@ const char *GAME_BANNER =
   "                 _|_|      _|      _|    _|  _|        _|_|    \r\n"
   "                     _|    _|      _|    _|  _|        _|  _|  \r\n"
   "               _|_|_|        _|_|    _|_|_|    _|_|_|  _|    _|\r\n"
-  "                 Copyright © 2023 Stack for STM32 Developers   \r\n";
+  "                   Copyright (C) 2023 Arthur, Riley and Wei    \r\n";
 
 void setup() {
   char *greeting = "Hello, world!";
