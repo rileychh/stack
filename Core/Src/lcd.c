@@ -227,14 +227,13 @@ void LCD_draw_fb(unsigned char *fb) {
 
   for (i = 0; i < 8; i++) {
     // for each page
-    command_delay();
     LCD_Command = Set_Page_Addr_X | i;   // page number
+    command_delay();
     LCD_Command = Set_ColH_Addr_X | 0x0; // fixed col first addr
     command_delay();
     LCD_Command = Set_ColL_Addr_X | 0x0;
     command_delay();
 
-    command_delay();
     for (j = 0; j < 128; j++) {
       LCD_Data = *fb++;
     }
@@ -323,8 +322,8 @@ void LCD_Init(void) {
   /* Configure the FSMC Parallel interface -------------------------------------*/
   LCD_FSMCConfig();
 
-  command_delay();
   LCD_Command = Display_Off;
+  command_delay();
   LCD_Command = LCD_Reset;
   reset_delay();
 
@@ -436,7 +435,7 @@ void LCD_Reset_Cursor(void) {
 void LCD_Clr_Cursor() {
   unsigned char i = 16;
   unsigned char data = 0x00;
-  signed char x_p;
+  signed char x_p = 0;
 
   unsigned char col_no; // 0x38+x
   unsigned char col_high;
@@ -492,7 +491,7 @@ void LCD_Set_Cursor(signed char x) {
   // page 3
   LCD_Command = Set_Page_Addr_X | 3;
   command_delay();
-  // column diff with x-postion
+  // column diff with x-position
 
   LCD_Command = Set_ColH_Addr_X | col_high;
   command_delay();
