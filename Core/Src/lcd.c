@@ -218,27 +218,18 @@ unsigned char ST_LOGO_TABLE[] = {
 };
 // clang-format on
 
-/*******************************************************************************
-* Function Name  : LCD_Draw_ST_Logo
-* Description    : draw a ST logo
-* Input          : None
-* Output         : None
-* Return         : 0 -- failure
-                   1 -- success
-*******************************************************************************/
 void LCD_Draw_ST_Logo() {
   unsigned char i, j;
   unsigned char *p = ST_LOGO_TABLE;
 
   LCD_Command = COM_Scan_Dir_Reverse;
-
   LCD_Command = Set_Start_Line_X | 0x0;
   delay();
 
   for (i = 0; i < 8; i++) {
     // for each page
-    LCD_Command = Set_Page_Addr_X | i; // page no.
     delay();
+    LCD_Command = Set_Page_Addr_X | i; // page number
     LCD_Command = Set_ColH_Addr_X | 0x0; // fixed col first addr
     delay();
     LCD_Command = Set_ColL_Addr_X | 0x0;
@@ -250,18 +241,17 @@ void LCD_Draw_ST_Logo() {
       delay();
     }
   }
+/**
+ * @brief Draws a ST logo
+ */
 }
 
-/*******************************************************************************
-* Function Name  : LCD_DrawChar
-* Description    : draw an char at certain postion
-* Input          : Xpage -- postion of page
-                   YCol -- postion of colomn
-                   offset -- font offset in the ChineseTable[]
-* Output         : None
-* Return         : 0 -- failure
-                   1 -- success
-*******************************************************************************/
+/**
+ * @brief Draw an character at certain position
+ * @param Xpage position of page
+ * @param YCol position of column
+ * @param offset font offset in the ASCII_LUT
+ */
 void LCD_DrawChar(unsigned char Xpage, unsigned char YCol, unsigned char offset) {
   int i = 8;
   unsigned char coll = YCol & 0x0f;
@@ -293,17 +283,14 @@ void LCD_DrawChar(unsigned char Xpage, unsigned char YCol, unsigned char offset)
   }
 }
 
-/*******************************************************************************
-* Function Name  : LCD_DrawString
-* Description    : draw a string of length at certain postion
-* Input          : Xpage -- postion of page
-                   YCol -- postion of colomn
-                   c -- pointer to the string to be displayed
-                   length -- length of string
-* Output         : None
-* Return         : 0 -- failure
-                   1 -- success
-*******************************************************************************/
+/**
+ * @brief Draw a string of a specified length at a certain position on the LCD.
+ * @param Xpage Position of the page where the string will be drawn.
+ * @param YCol Position of the column where the string will begin.
+ * @param c Pointer to the string to be displayed.
+ * @param length Length of the string to be displayed.
+ * @return int Returns 1 on success and 0 on failure.
+ */
 int LCD_DrawString(unsigned char Xpage, unsigned char YCol, char *c, unsigned char length) {
   unsigned char len = length;
   char *pOffset = c;
@@ -339,13 +326,9 @@ void power_delay(void) {
     ;
 }
 
-/*******************************************************************************
- * Function Name  : STM3210E_LCD_Init
- * Description    : Initializes the LCD.
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief Initializes the LCD.
+ */
 void LCD_Init(void) {
   /* Configure the LCD Control pins --------------------------------------------*/
   LCD_CtrlLinesConfig();
@@ -353,9 +336,9 @@ void LCD_Init(void) {
   /* Configure the FSMC Parallel interface -------------------------------------*/
   LCD_FSMCConfig();
 
-  LCD_Command = Display_Off; //
   delay();
-  LCD_Command = LCD_Reset; //
+  LCD_Command = Display_Off;
+  LCD_Command = LCD_Reset;
   reset_delay();
 
   LCD_Command = Set_LCD_Bias_9;
@@ -368,7 +351,7 @@ void LCD_Init(void) {
   delay();
 
   LCD_Command = 0x2c;
-  power_delay(); // 50ms requried
+  power_delay(); // 50ms required
   LCD_Command = 0x2e;
   power_delay(); // 50ms
   LCD_Command = 0x2f;
@@ -395,13 +378,9 @@ void LCD_Init(void) {
   delay();
 }
 
-/*******************************************************************************
- * Function Name  : LCD_Clear
- * Description    : Clears the hole LCD.
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief Clears the whole LCD.
+ */
 void LCD_Clear(void) {
   unsigned char i, j = 128;
   unsigned char data = 0x0;
@@ -425,13 +404,9 @@ void LCD_Clear(void) {
   }
 }
 
-/*******************************************************************************
- * Function Name  : LCD_Reset_Cursor
- * Description    : set the cursor at the middle of LCD --> at page 3&4 column (64-8)~(64+8)
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief set the cursor at the middle of LCD --> at page 3&4 column (64-8)~(64+8)
+ */
 void LCD_Reset_Cursor(void) {
   unsigned char i = 16;
   unsigned char data = 0xff;
@@ -446,7 +421,7 @@ void LCD_Reset_Cursor(void) {
   delay();
   LCD_Command = Set_ColL_Addr_X | 0x8;
   delay();
-  while (i--) // write 16 column
+  while (i--) // write 16 columns
   {
     LCD_Data = data;
     delay();
@@ -459,26 +434,22 @@ void LCD_Reset_Cursor(void) {
   delay();
   LCD_Command = Set_ColL_Addr_X | 0x8;
   delay();
-  while (i--) // write 16 column
+  while (i--) // write 16 columns
   {
     LCD_Data = data;
     delay();
   }
 }
 
-/*******************************************************************************
-* Function Name  : LCD_Clr_Cursor
-* Description    : clear the cursor at any location --> but only need to
-                   clear the data in ram at at page 3&4 column (64-8)~(64+8)
-                   as far as where it looks on LCD depends on the y-position
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-signed char x_p;
+/**
+ * @brief Clears the cursor at any location. This function only needs to clear the data in RAM at page 3 & 4, columns (64-8) to (64+8), as the actual appearance on the LCD depends on the y-position.
+ *
+ * It specifically targets a predefined area in the RAM to clear the cursor representation.
+ */
 void LCD_Clr_Cursor() {
   unsigned char i = 16;
   unsigned char data = 0x00;
+  signed char x_p;
 
   unsigned char col_no; // 0x38+x
   unsigned char col_high;
@@ -515,15 +486,11 @@ void LCD_Clr_Cursor() {
   }
 }
 
-/*******************************************************************************
-* Function Name  : LCD_PowerOn
-* Description    : always handle cursor data of ram with page=3/4 no matter
-                   what is the y-postion and different column corresponding
-                   to diff x_postion
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+ * @brief Handles the cursor data in RAM, always using pages 3 and 4, regardless of the y-position. The column to be used varies according to the different x-positions.
+ *
+ * This function manages the cursor data, specifically on pages 3 and 4 of the RAM, and the column used varies based on the x-position.
+ */
 void LCD_Set_Cursor(signed char x) {
   unsigned char i = 16;
   unsigned char data = 0xff;
@@ -557,20 +524,16 @@ void LCD_Set_Cursor(signed char x) {
   delay();
   LCD_Command = Set_ColL_Addr_X | col_low;
   delay();
-  while (i--) // write 16 column
+  while (i--) // write 16 columns
   {
     LCD_Data = data;
     delay();
   }
 }
 
-/*******************************************************************************
- * Function Name  : LCD_PowerOn
- * Description    : Power on the LCD.
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief Powers on the LCD.
+ */
 void LCD_PowerOn(void) {
   LCD_Command = 0x2c;
   delay();
@@ -580,36 +543,23 @@ void LCD_PowerOn(void) {
   delay();
 }
 
-/*******************************************************************************
- * Function Name  : LCD_DisplayOn
- * Description    : Enables the Display.
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief Enables the Display.
+ */
 void LCD_DisplayOn(void) {
   LCD_Command = Display_On;
 }
 
-/*******************************************************************************
- * Function Name  : LCD_DisplayOff
- * Description    : Disables the Display.
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief Disables the Display.
+ */
 void LCD_DisplayOff(void) {
   LCD_Command = Display_Off;
 }
 
-/*******************************************************************************
-* Function Name  : LCD_CtrlLinesConfig
-* Description    : Configures LCD Control lines (FSMC Pins) in alternate function
-                   Push-Pull mode.
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+ * @brief Configures LCD Control lines (FSMC Pins) in alternate function Push-Pull mode.
+ */
 void LCD_CtrlLinesConfig(void) {
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -652,16 +602,10 @@ void LCD_CtrlLinesConfig(void) {
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 }
 
-/*******************************************************************************
- * Function Name  : LCD_FSMCConfig
- * Description    : Configures the Parallel interface (FSMC) for LCD(Parallel mode)
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+/**
+ * @brief Configures the Parallel interface (FSMC) for LCD(Parallel mode)
+ */
 void LCD_FSMCConfig(void) {
-  // FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
-  // FSMC_NORSRAMTimingInitTypeDef  p;
   SRAM_HandleTypeDef hsram4;
   FSMC_NORSRAM_TimingTypeDef p;
 
