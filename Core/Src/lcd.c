@@ -223,18 +223,18 @@ void LCD_draw_fb(unsigned char *fb) {
 
   LCD_Command = COM_Scan_Dir_Reverse;
   LCD_Command = Set_Start_Line_X | 0x0;
-  delay();
+  command_delay();
 
   for (i = 0; i < 8; i++) {
     // for each page
-    delay();
-    LCD_Command = Set_Page_Addr_X | i; // page number
+    command_delay();
+    LCD_Command = Set_Page_Addr_X | i;   // page number
     LCD_Command = Set_ColH_Addr_X | 0x0; // fixed col first addr
-    delay();
+    command_delay();
     LCD_Command = Set_ColL_Addr_X | 0x0;
-    delay();
+    command_delay();
 
-      delay();
+    command_delay();
     for (j = 0; j < 128; j++) {
       LCD_Data = *fb++;
     }
@@ -261,27 +261,27 @@ void LCD_DrawChar(unsigned char Xpage, unsigned char YCol, unsigned char offset)
   unsigned char *c = ASCII_LUT + 16 * offset;
 
   LCD_Command = Set_Start_Line_X | 0x0;
-  delay();
+  command_delay();
   LCD_Command = Set_Page_Addr_X | Xpage;
-  delay();
+  command_delay();
   LCD_Command = Set_ColH_Addr_X | colh;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | coll;
-  delay();
+  command_delay();
   while (i--) {
     LCD_Data = *c++;
-    delay();
+    command_delay();
   }
   i = 8;
   LCD_Command = Set_Page_Addr_X | (Xpage + 1);
-  delay();
+  command_delay();
   LCD_Command = Set_ColH_Addr_X | colh;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | coll;
-  delay();
+  command_delay();
   while (i--) {
     LCD_Data = *c++;
-    delay();
+    command_delay();
   }
 }
 
@@ -309,23 +309,8 @@ int LCD_DrawString(unsigned char Xpage, unsigned char YCol, char *c, unsigned ch
   }
 }
 
-void delay(void) {
-  volatile unsigned char i = 0x8;
-  while (i--) {
-    // asm("NOP");
-  }
-}
-
-void reset_delay(void) {
-  volatile unsigned long i = 0xff;
-  while (i--)
-    ;
-}
-
-void power_delay(void) {
-  volatile unsigned long i = 0x4ffff;
-  while (i--)
-    ;
+void delay(volatile unsigned long length) {
+  while (length--) {}
 }
 
 /**
@@ -338,19 +323,19 @@ void LCD_Init(void) {
   /* Configure the FSMC Parallel interface -------------------------------------*/
   LCD_FSMCConfig();
 
-  delay();
+  command_delay();
   LCD_Command = Display_Off;
   LCD_Command = LCD_Reset;
   reset_delay();
 
   LCD_Command = Set_LCD_Bias_9;
-  delay();
+  command_delay();
   LCD_Command = Set_ADC_Normal;
-  delay();
+  command_delay();
   LCD_Command = COM_Scan_Dir_Reverse;
-  delay();
+  command_delay();
   LCD_Command = Set_Start_Line_X | 0x0;
-  delay();
+  command_delay();
 
   LCD_Command = 0x2c;
   power_delay(); // 50ms required
@@ -360,24 +345,24 @@ void LCD_Init(void) {
   power_delay(); // 50ms
 
   LCD_Command = Set_Ref_Vol_Reg | 0x05;
-  delay();
+  command_delay();
   LCD_Command = Set_Ref_Vol_Mode;
-  delay();
+  command_delay();
   LCD_Command = Set_Ref_Vol_Reg;
-  delay();
+  command_delay();
 
   LCD_Clear();
-  delay();
+  command_delay();
 
   LCD_Command = Set_Page_Addr_X | 0x0;
-  delay();
+  command_delay();
   LCD_Command = Set_ColH_Addr_X | 0x0;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | 0x0;
-  delay();
+  command_delay();
 
   LCD_Command = Display_On;
-  delay();
+  command_delay();
 }
 
 /**
@@ -388,20 +373,20 @@ void LCD_Clear(void) {
   unsigned char data = 0x0;
 
   LCD_Command = Set_Start_Line_X | 0x0; // start line
-  delay();
+  command_delay();
 
   for (i = 0; i < 8; i++) {
     // for each page
     LCD_Command = Set_Page_Addr_X | i; // page no.
-    delay();
+    command_delay();
     LCD_Command = Set_ColH_Addr_X | 0x0; // fixed col first addr
-    delay();
+    command_delay();
     LCD_Command = Set_ColL_Addr_X | 0x0;
-    delay();
+    command_delay();
 
     while (j--) {
       LCD_Data = data;
-      delay();
+      command_delay();
     }
   }
 }
@@ -414,32 +399,32 @@ void LCD_Reset_Cursor(void) {
   unsigned char data = 0xff;
 
   LCD_Command = Set_Start_Line_X | 0x0; // start line
-  delay();
+  command_delay();
   // page 3
   LCD_Command = Set_Page_Addr_X | 3;
-  delay();
+  command_delay();
   // column 0x38
   LCD_Command = Set_ColH_Addr_X | 0x3;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | 0x8;
-  delay();
+  command_delay();
   while (i--) // write 16 columns
   {
     LCD_Data = data;
-    delay();
+    command_delay();
   }
   i = 16;
   // page 4
   LCD_Command = Set_Page_Addr_X | 4;
-  delay();
+  command_delay();
   LCD_Command = Set_ColH_Addr_X | 0x3;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | 0x8;
-  delay();
+  command_delay();
   while (i--) // write 16 columns
   {
     LCD_Data = data;
-    delay();
+    command_delay();
   }
 }
 
@@ -462,29 +447,29 @@ void LCD_Clr_Cursor() {
 
   // page 3
   LCD_Command = Set_Page_Addr_X | 3;
-  delay();
+  command_delay();
   // column 0x38
   LCD_Command = Set_ColH_Addr_X | col_high;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | col_low;
-  delay();
+  command_delay();
   while (i--) // write 16 column
   {
     LCD_Data = data;
-    delay();
+    command_delay();
   }
   i = 16;
   // page 4
   LCD_Command = Set_Page_Addr_X | 4;
-  delay();
+  command_delay();
   LCD_Command = Set_ColH_Addr_X | col_high;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | col_low;
-  delay();
+  command_delay();
   while (i--) // write 16 column
   {
     LCD_Data = data;
-    delay();
+    command_delay();
   }
 }
 
@@ -506,30 +491,30 @@ void LCD_Set_Cursor(signed char x) {
 
   // page 3
   LCD_Command = Set_Page_Addr_X | 3;
-  delay();
+  command_delay();
   // column diff with x-postion
 
   LCD_Command = Set_ColH_Addr_X | col_high;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | col_low;
-  delay();
+  command_delay();
   while (i--) // write 16 column
   {
     LCD_Data = data;
-    delay();
+    command_delay();
   }
   i = 16;
   // page 4
   LCD_Command = Set_Page_Addr_X | 4;
-  delay();
+  command_delay();
   LCD_Command = Set_ColH_Addr_X | col_high;
-  delay();
+  command_delay();
   LCD_Command = Set_ColL_Addr_X | col_low;
-  delay();
+  command_delay();
   while (i--) // write 16 columns
   {
     LCD_Data = data;
-    delay();
+    command_delay();
   }
 }
 
@@ -538,11 +523,11 @@ void LCD_Set_Cursor(signed char x) {
  */
 void LCD_PowerOn(void) {
   LCD_Command = 0x2c;
-  delay();
+  command_delay();
   LCD_Command = 0x2e;
-  delay();
+  command_delay();
   LCD_Command = 0x2f;
-  delay();
+  command_delay();
 }
 
 /**
@@ -625,7 +610,7 @@ void LCD_FSMCConfig(void) {
   hsram4.Instance = FSMC_NORSRAM_DEVICE;
   hsram4.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
   /* Color LCD configuration ------------------------------------
-     LCD configured as follow:
+     The LCD is configured as follows:
         - Data/Address MUX = Disable
         - Memory Type = SRAM
         - Data Width = 16bit

@@ -45,9 +45,10 @@ void LCD_DisplayOff(void);
 void LCD_CtrlLinesConfig(void);
 void LCD_FSMCConfig(void);
 
-void delay(void);
-void reset_delay(void);
-void power_delay(void);
+void delay(volatile unsigned long length);
+#define command_delay() delay(0x8)
+#define reset_delay() delay(0xff)
+#define power_delay() delay(0x4ffff)
 
 void LCD_Draw_ST_Logo(void);
 void LCD_Reset_Cursor(void);
