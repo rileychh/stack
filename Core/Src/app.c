@@ -4,12 +4,7 @@
 #include "main.h"
 #include "uart_stdio.h"
 
-#include <stdint.h>
 #include <string.h>
-
-extern UART_HandleTypeDef huart1;
-extern ADC_HandleTypeDef hadc1;
-extern TIM_HandleTypeDef htim6;
 
 const char *GAME_BANNER =
   "\r\n"
@@ -20,21 +15,23 @@ const char *GAME_BANNER =
   "               _|_|_|        _|_|    _|_|_|    _|_|_|  _|    _|\r\n"
   "                   Copyright (C) 2023 Arthur, Riley and Wei    \r\n";
 
-void setup() {
-  puts(GAME_BANNER);
-  char s[100];
-  printf("Enter a string: ");
-  scanf("%s", s);
-  printf("\r\nYou entered: %s\r\n", s);
+GameSession session;
 
+void setup() {
   LCD_Init();
+
+  session.score = 0;
+  session.state = STATE_IDLE;
 
   HAL_TIM_Base_Start_IT(&htim6);
 }
 
 void loop() {
-  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-  HAL_Delay(500);
+  switch (session.state) {
+  case STATE_IDLE: handle_idle_state(); break;
+  case STATE_PLAYING: handle_playing_state(); break;
+  case STATE_PAUSED: handle_paused_state(); break;
+  }
 }
 
 /**
@@ -44,24 +41,40 @@ void loop() {
  * @see MX_TIM6_Init()
  */
 void on_tim6(void) {
-  static int y_pos = 0;
-
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-
-  LCD_Clear();
-  char *line = "________";
-  LCD_DrawString(1, y_pos, line, strlen(line));
-
-  if (y_pos >= 40) {
-    y_pos += 8;
-  } else if (y_pos <= 0) {
-    y_pos -= 8;
-  }
-
-  HAL_ADC_Start(&hadc1);
-  uint32_t adc_value = HAL_ADC_GetValue(&hadc1);
-  HAL_ADC_Stop(&hadc1);
-  printf("ADC value: %lu\r\n", adc_value);
-
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+}
+
+void handle_idle_state(void) {
+  puts(GAME_BANNER);
+  centered_puts("Press [Key] to start the game", CONSOLE_WIDTH);
+
+  GPIO_PinState isPressed;
+  do {
+    isPressed = HAL_GPIO_ReadPin(User_Button_GPIO_Port, User_Button_Pin);
+  } while (!isPressed);
+
+  // TODO choose difficulty
+  // TODO choose speed
+}
+
+void handle_playing_state(void) {
+}
+
+void handle_paused_state(void) {
+}
+
+uint32_t read_adc() {
+  HAL_ADC_Start(&hadc1);
+  uint32_t value = HAL_ADC_GetValue(&hadc1);
+  HAL_ADC_Stop(&hadc1);
+  return value;
+}
+
+int centered_puts(const char *s, uint8_t width) {
+  size_t len = strlen(s);
+  if (len > width) return puts(s);
+  uint8_t padding = (width - len) >> 1; // half the value by shifting
+  while (padding--) putchar(' ');
+  return puts(s);
 }
