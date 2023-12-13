@@ -42,9 +42,6 @@ void LCD_PowerOn(void);
 void LCD_DisplayOn(void);
 void LCD_DisplayOff(void);
 
-void LCD_CtrlLinesConfig(void);
-void LCD_FSMCConfig(void);
-
 void delay(volatile unsigned long length);
 #define command_delay() delay(0x8)
 #define reset_delay() delay(0xff)
