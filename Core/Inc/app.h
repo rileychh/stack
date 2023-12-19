@@ -13,14 +13,13 @@
 // Enums and Structs
 
 typedef enum {
-  STATE_IDLE,
+  STATE_INIT,
   STATE_PLAYING,
   STATE_PAUSED,
 } GameState;
 
 typedef struct {
   GameState state;
-  uint8_t speed;
   uint8_t difficulty;
   size_t score;
 } GameSession;
@@ -34,7 +33,7 @@ void on_tim6(void);
 // Private functions
 
 uint32_t read_adc(void);
-void handle_idle_state(void);
+void handle_init_state(void);
 void handle_playing_state(void);
 void handle_paused_state(void);
 
