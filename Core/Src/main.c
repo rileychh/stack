@@ -338,6 +338,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(MicroSDCard_Detect_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : User_Button_Pin */
+  GPIO_InitStruct.Pin = User_Button_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(User_Button_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : I2S_CMD_Pin I2S_CK_Pin I2S_DIN_Pin CAN_TX_Pin */
   GPIO_InitStruct.Pin = I2S_CMD_Pin|I2S_CK_Pin|I2S_DIN_Pin|CAN_TX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -349,12 +355,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : User_Button_Pin */
-  GPIO_InitStruct.Pin = User_Button_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(User_Button_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : I2S_MCK_Pin */
   GPIO_InitStruct.Pin = I2S_MCK_Pin;
@@ -409,6 +409,10 @@ static void MX_GPIO_Init(void)
 
   /*Configure peripheral I/O remapping */
   __HAL_AFIO_REMAP_CAN1_2();
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

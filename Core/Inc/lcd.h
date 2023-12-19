@@ -52,3 +52,5 @@ void LCD_Reset_Cursor(void);
 void LCD_Clr_Cursor(void);
 void LCD_Set_Cursor(signed char x);
 #endif /* __LCD_H */
+
+

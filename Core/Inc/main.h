@@ -137,6 +137,9 @@ void Error_Handler(void);
 #define D11_GPIO_Port GPIOE
 #define D12_Pin GPIO_PIN_15
 #define D12_GPIO_Port GPIOE
+#define User_Button_Pin GPIO_PIN_10
+#define User_Button_GPIO_Port GPIOB
+#define User_Button_EXTI_IRQn EXTI15_10_IRQn
 #define I2S_CMD_Pin GPIO_PIN_12
 #define I2S_CMD_GPIO_Port GPIOB
 #define I2S_CK_Pin GPIO_PIN_13
@@ -171,8 +174,6 @@ void Error_Handler(void);
 #define A15_GPIO_Port GPIOG
 #define JOY_SEL_Pin GPIO_PIN_7
 #define JOY_SEL_GPIO_Port GPIOG
-#define User_Button_Pin GPIO_PIN_8
-#define User_Button_GPIO_Port GPIOG
 #define I2S_MCK_Pin GPIO_PIN_6
 #define I2S_MCK_GPIO_Port GPIOC
 #define MicroSDCard_D0_Pin GPIO_PIN_8
