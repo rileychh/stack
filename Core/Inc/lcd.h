@@ -1,6 +1,8 @@
 #ifndef __LCD_H
 #define __LCD_H
 
+#include "stm32f1xx.h"
+
 #define Set_Start_Line_X 0x40
 #define Set_Page_Addr_X 0xb0
 #define Set_ColH_Addr_X 0x10
@@ -27,9 +29,14 @@
 #define Display_All_On 0xa5
 #define Display_All_Normal 0xa4
 
-// ZYMG12864
-#define LCD_Command *((volatile unsigned char *)0x6c000000) // A0=0 -- cmd
-#define LCD_Data *((volatile unsigned char *)0x6c000001)    // A0=1 -- data
+// The 128x64 LCD module is using ST7565
+typedef __IO struct {
+  uint8_t cmd;  // A0=0
+  uint8_t data; // A0=1
+} lcd_t;
+#define LCD ((lcd_t *)FSMC_BANK1_4)
+#define LCD_Command LCD->cmd
+#define LCD_Data LCD->data
 
 void LCD_Init(void);
 void LCD_Clear(void);
