@@ -35,15 +35,12 @@ void loop() {
   }
 }
 
-/**
- * @brief TIM6 Update Interrupt Service Routine
- *
- * This function runs every `htim6.Init.Period / 10` milliseconds.
- * @see MX_TIM6_Init()
- */
 void on_tim6(void) {
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+}
+
+void on_user_button_press(void) {
 }
 
 void handle_init_state(void) {

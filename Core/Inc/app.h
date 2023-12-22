@@ -28,7 +28,22 @@ typedef struct {
 
 void setup(void);
 void loop(void);
+
+/**
+ * @brief TIM6 Global Interrupt Service Routine
+ *
+ * This function runs every `htim6.Init.Period / 10` milliseconds.
+ * @see MX_TIM6_Init()
+ */
 void on_tim6(void);
+
+/**
+ * @brief EXTI line[15:10] Interrupts Service Routine
+ *
+ * Pressing the `User_Button` (Labeled "Key" on the PCB)
+ * triggers EXTI10, in which triggers this function.
+ */
+void on_user_button_press(void);
 
 // Private functions
 
