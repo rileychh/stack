@@ -28,7 +28,7 @@ typedef struct {
 
 void setup(void);
 void loop(void);
-
+int brick_place(void);
 /**
  * @brief TIM6 Global Interrupt Service Routine
  *
