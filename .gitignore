@@ -13,3 +13,6 @@
 /.cproject
 /.project
 /MDK-ARM/
+
+# Python virtual environment
+/Tools/.venv/
