@@ -36,6 +36,9 @@ typedef __IO struct {
 } lcd_t;
 #define LCD ((lcd_t *)FSMC_BANK1_4)
 
+void lcd_send_command(uint8_t cmd);
+void lcd_send_data(uint8_t data);
+
 void LCD_Init(void);
 void LCD_Clear(void);
 

@@ -1,6 +1,6 @@
 #include "lcd.h"
 
-unsigned char ASCII_LUT[], ST_LOGO_TABLE[];
+unsigned char ASCII_LUT[];
 
 void lcd_send_command(uint8_t cmd) {
   LCD->cmd = cmd;
