@@ -301,7 +301,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOF, LED1_Pin|LED2_Pin|LED3_Pin|LED4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, SPI1_CS_Pin|USB_Disconnect_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LCD_backlight_GPIO_Port, LCD_backlight_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(Audio_PDN_GPIO_Port, Audio_PDN_Pin, GPIO_PIN_RESET);
@@ -325,12 +328,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SPI1_CS_Pin USB_Disconnect_Pin */
-  GPIO_InitStruct.Pin = SPI1_CS_Pin|USB_Disconnect_Pin;
+  /*Configure GPIO pin : SPI1_CS_Pin */
+  GPIO_InitStruct.Pin = SPI1_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(SPI1_CS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : MicroSDCard_Detect_Pin */
   GPIO_InitStruct.Pin = MicroSDCard_Detect_Pin;
@@ -338,23 +341,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(MicroSDCard_Detect_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : User_Button_Pin */
-  GPIO_InitStruct.Pin = User_Button_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(User_Button_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : I2S_CMD_Pin I2S_CK_Pin I2S_DIN_Pin CAN_TX_Pin */
-  GPIO_InitStruct.Pin = I2S_CMD_Pin|I2S_CK_Pin|I2S_DIN_Pin|CAN_TX_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  /*Configure GPIO pins : User_Button_Pin JOY_SEL_Pin */
+  GPIO_InitStruct.Pin = User_Button_Pin|JOY_SEL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : JOY_SEL_Pin JOY_RIGHT_Pin JOY_LEFT_Pin JOY_UP_Pin */
-  GPIO_InitStruct.Pin = JOY_SEL_Pin|JOY_RIGHT_Pin|JOY_LEFT_Pin|JOY_UP_Pin;
+  /*Configure GPIO pins : JOY_RIGHT_Pin JOY_LEFT_Pin JOY_UP_Pin JOY_DOWN_Pin
+                           CAN_RX_Pin */
+  GPIO_InitStruct.Pin = JOY_RIGHT_Pin|JOY_LEFT_Pin|JOY_UP_Pin|JOY_DOWN_Pin
+                          |CAN_RX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : I2S_MCK_Pin */
   GPIO_InitStruct.Pin = I2S_MCK_Pin;
@@ -370,17 +369,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : LCD_backlight_Pin */
+  GPIO_InitStruct.Pin = LCD_backlight_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LCD_backlight_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : MicroSDCard_CMD_Pin */
   GPIO_InitStruct.Pin = MicroSDCard_CMD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(MicroSDCard_CMD_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : JOY_DOWN_Pin */
-  GPIO_InitStruct.Pin = JOY_DOWN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(JOY_DOWN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : Audio_PDN_Pin */
   GPIO_InitStruct.Pin = Audio_PDN_Pin;
@@ -401,11 +401,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : CAN_RX_Pin */
-  GPIO_InitStruct.Pin = CAN_RX_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(CAN_RX_GPIO_Port, &GPIO_InitStruct);
+  /*Configure GPIO pin : CAN_TX_Pin */
+  GPIO_InitStruct.Pin = CAN_TX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(CAN_TX_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure peripheral I/O remapping */
   __HAL_AFIO_REMAP_CAN1_2();

@@ -41,6 +41,7 @@ void on_tim6(void);
  * @brief EXTI line[15:10] Interrupts Service Routine
  *
  * Pressing the `User_Button` (Labeled "Key" on the PCB)
+ * or the `JOY_SEL` (Pressing down the joystick)
  * triggers EXTI10, in which triggers this function.
  */
 void on_user_button_press(void);
