@@ -13,4 +13,18 @@
       <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/MDK-ARM" />
     </exec>
   </tool>
+  <tool name="Keil uVision Build (Bottles)" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="false" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="/usr/bin/flatpak" />
+      <option name="PARAMETERS" value="run --command=bottles-cli com.usebottles.bottles shell -b &quot;Keil MDK-ARM&quot; -i &quot;C:/Keil_v5/UV4/UV4.exe -b $ProjectFileDir$/MDK-ARM/$ProjectName$.uvprojx -o build.log&quot;" />
+      <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/MDK-ARM" />
+    </exec>
+  </tool>
+  <tool name="Keil uVision Clean (Bottles)" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="false" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="C:\Keil_v5\UV4\UV4.exe" />
+      <option name="PARAMETERS" value="run --command=bottles-cli com.usebottles.bottles shell -b &quot;Keil MDK-ARM&quot; -i &quot;C:/Keil_v5/UV4/UV4.exe -b $ProjectFileDir$/MDK-ARM/$ProjectName$.uvprojx -o clean.log&quot;" />
+      <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/MDK-ARM" />
+    </exec>
+  </tool>
 </toolSet>
