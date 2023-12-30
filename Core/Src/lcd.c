@@ -1,28 +1,31 @@
 #include "lcd.h"
 
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx_hal_sram.h"
-
 unsigned char ASCII_LUT[], ST_LOGO_TABLE[];
+
+void lcd_send_command(uint8_t cmd) {
+  LCD->cmd = cmd;
+  command_delay();
+}
+
+void lcd_send_data(uint8_t data) {
+  LCD->data = data;
+  command_delay();
+}
 
 void LCD_draw_fb(unsigned char *fb) {
   unsigned char i, j;
 
-  LCD_Command = COM_Scan_Dir_Reverse;
-  LCD_Command = Set_Start_Line_X | 0x0;
-  command_delay();
+  lcd_send_command(COM_Scan_Dir_Reverse);
+  lcd_send_command(Set_Start_Line_X | 0x0);
 
+  // for each page
   for (i = 0; i < 8; i++) {
-    // for each page
-    LCD_Command = Set_Page_Addr_X | i;   // page number
-    command_delay();
-    LCD_Command = Set_ColH_Addr_X | 0x0; // fixed col first addr
-    command_delay();
-    LCD_Command = Set_ColL_Addr_X | 0x0;
-    command_delay();
+    lcd_send_command(Set_Page_Addr_X | i);
+    lcd_send_command(Set_ColH_Addr_X | 0x0);
+    lcd_send_command(Set_ColL_Addr_X | 0x0);
 
     for (j = 0; j < 128; j++) {
-      LCD_Data = *fb++;
+      lcd_send_data(*fb++);
     }
   }
 }
@@ -46,28 +49,20 @@ void LCD_DrawChar(unsigned char Xpage, unsigned char YCol, unsigned char offset)
   unsigned char colh = YCol >> 4;
   unsigned char *c = ASCII_LUT + 16 * offset;
 
-  LCD_Command = Set_Start_Line_X | 0x0;
-  command_delay();
-  LCD_Command = Set_Page_Addr_X | Xpage;
-  command_delay();
-  LCD_Command = Set_ColH_Addr_X | colh;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | coll;
-  command_delay();
+  lcd_send_command(Set_Start_Line_X | 0);
+  lcd_send_command(Set_Page_Addr_X | Xpage);
+  lcd_send_command(Set_ColH_Addr_X | colh);
+  lcd_send_command(Set_ColL_Addr_X | coll);
+
   while (i--) {
-    LCD_Data = *c++;
-    command_delay();
+    lcd_send_data(*c++);
   }
   i = 8;
-  LCD_Command = Set_Page_Addr_X | (Xpage + 1);
-  command_delay();
-  LCD_Command = Set_ColH_Addr_X | colh;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | coll;
-  command_delay();
+  lcd_send_command(Set_Page_Addr_X | (Xpage + 1));
+  lcd_send_command(Set_ColH_Addr_X | colh);
+  lcd_send_command(Set_ColL_Addr_X | coll);
   while (i--) {
-    LCD_Data = *c++;
-    command_delay();
+    lcd_send_data(*c++);
   }
 }
 
@@ -103,70 +98,50 @@ void delay(volatile unsigned long length) {
  * @brief Initializes the LCD.
  */
 void LCD_Init(void) {
-  LCD_Command = Display_Off;
-  command_delay();
-  LCD_Command = LCD_Reset;
+  lcd_send_command(Display_Off);
+  lcd_send_command(LCD_Reset);
   reset_delay();
 
-  LCD_Command = Set_LCD_Bias_9;
-  command_delay();
-  LCD_Command = Set_ADC_Normal;
-  command_delay();
-  LCD_Command = COM_Scan_Dir_Reverse;
-  command_delay();
-  LCD_Command = Set_Start_Line_X | 0x0;
-  command_delay();
+  lcd_send_command(Set_LCD_Bias_9);
+  lcd_send_command(Set_ADC_Normal);
+  lcd_send_command(COM_Scan_Dir_Reverse);
+  lcd_send_command(Set_Start_Line_X | 0x0);
 
-  LCD_Command = 0x2c;
-  power_delay(); // 50ms required
-  LCD_Command = 0x2e;
-  power_delay(); // 50ms
-  LCD_Command = 0x2f;
-  power_delay(); // 50ms
+  lcd_send_command(0x2c); // 50ms required
+  power_delay();
+  lcd_send_command(0x2e); // 50ms
+  power_delay();
+  lcd_send_command(0x2f); // 50ms
+  power_delay();
 
-  LCD_Command = Set_Ref_Vol_Reg | 0x05;
-  command_delay();
-  LCD_Command = Set_Ref_Vol_Mode;
-  command_delay();
-  LCD_Command = Set_Ref_Vol_Reg;
-  command_delay();
+  lcd_send_command(Set_Ref_Vol_Reg | 0x05);
+  lcd_send_command(Set_Ref_Vol_Mode);
+  lcd_send_command(Set_Ref_Vol_Reg);
 
   LCD_Clear();
-  command_delay();
 
-  LCD_Command = Set_Page_Addr_X | 0x0;
-  command_delay();
-  LCD_Command = Set_ColH_Addr_X | 0x0;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | 0x0;
-  command_delay();
+  lcd_send_command(Set_Page_Addr_X | 0x0);
+  lcd_send_command(Set_ColH_Addr_X | 0x0);
+  lcd_send_command(Set_ColL_Addr_X | 0x0);
 
-  LCD_Command = Display_On;
-  command_delay();
+  lcd_send_command(Display_On);
 }
 
 /**
  * @brief Clears the whole LCD.
  */
 void LCD_Clear(void) {
-  unsigned char i, j = 128;
-  unsigned char data = 0x0;
+  unsigned char i, j;
 
-  LCD_Command = Set_Start_Line_X | 0x0; // start line
-  command_delay();
+  lcd_send_command(Set_Start_Line_X | 0x0); // start line
 
   for (i = 0; i < 8; i++) {
-    // for each page
-    LCD_Command = Set_Page_Addr_X | i; // page no.
-    command_delay();
-    LCD_Command = Set_ColH_Addr_X | 0x0; // fixed col first addr
-    command_delay();
-    LCD_Command = Set_ColL_Addr_X | 0x0;
-    command_delay();
+    lcd_send_command(Set_Page_Addr_X | i); // page no.
+    lcd_send_command(Set_ColH_Addr_X | 0x0); // fixed col first addr
+    lcd_send_command(Set_ColL_Addr_X | 0x0);
 
-    while (j--) {
-      LCD_Data = data;
-      command_delay();
+    for (j = 0; j < 128; j++) {
+      lcd_send_data(0x0);
     }
   }
 }
@@ -175,36 +150,27 @@ void LCD_Clear(void) {
  * @brief set the cursor at the middle of LCD --> at page 3&4 column (64-8)~(64+8)
  */
 void LCD_Reset_Cursor(void) {
-  unsigned char i = 16;
-  unsigned char data = 0xff;
+  unsigned char i;
 
-  LCD_Command = Set_Start_Line_X | 0x0; // start line
-  command_delay();
+  lcd_send_command(Set_Start_Line_X | 0x0); // start line
+
   // page 3
-  LCD_Command = Set_Page_Addr_X | 3;
-  command_delay();
+  lcd_send_command(Set_Page_Addr_X | 3);
   // column 0x38
-  LCD_Command = Set_ColH_Addr_X | 0x3;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | 0x8;
-  command_delay();
-  while (i--) // write 16 columns
-  {
-    LCD_Data = data;
-    command_delay();
+  lcd_send_command(Set_ColH_Addr_X | 0x3);
+  lcd_send_command(Set_ColL_Addr_X | 0x8);
+
+  for (i = 0; i < 16; i++) {
+    lcd_send_data(0xff);
   }
-  i = 16;
+
   // page 4
-  LCD_Command = Set_Page_Addr_X | 4;
-  command_delay();
-  LCD_Command = Set_ColH_Addr_X | 0x3;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | 0x8;
-  command_delay();
-  while (i--) // write 16 columns
-  {
-    LCD_Data = data;
-    command_delay();
+  lcd_send_command(Set_Page_Addr_X | 4);
+  lcd_send_command(Set_ColH_Addr_X | 0x3);
+  lcd_send_command(Set_ColL_Addr_X | 0x8);
+
+  for (i = 0; i < 16; i++) {
+    lcd_send_data(0xff);
   }
 }
 
@@ -214,42 +180,28 @@ void LCD_Reset_Cursor(void) {
  * It specifically targets a predefined area in the RAM to clear the cursor representation.
  */
 void LCD_Clr_Cursor() {
-  unsigned char i = 16;
-  unsigned char data = 0x00;
-  signed char x_p = 0;
-
-  unsigned char col_no; // 0x38+x
-  unsigned char col_high;
-  unsigned char col_low;
-  col_no = 0x40 + (x_p / 8 - 1) * 8; // 0x38+x
+  unsigned char i;
+  unsigned char col_no, col_high, col_low;
+  col_no = 0x40;
   col_high = col_no >> 4;
   col_low = col_no & 0xf;
 
   // page 3
-  LCD_Command = Set_Page_Addr_X | 3;
-  command_delay();
-  // column 0x38
-  LCD_Command = Set_ColH_Addr_X | col_high;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | col_low;
-  command_delay();
-  while (i--) // write 16 column
-  {
-    LCD_Data = data;
-    command_delay();
+  lcd_send_command(Set_Page_Addr_X | 3);
+  lcd_send_command(Set_ColH_Addr_X | col_high);
+  lcd_send_command(Set_ColL_Addr_X | col_low);
+
+  for (i = 0; i < 16; i++) {
+    lcd_send_data(0x00);
   }
-  i = 16;
+
   // page 4
-  LCD_Command = Set_Page_Addr_X | 4;
-  command_delay();
-  LCD_Command = Set_ColH_Addr_X | col_high;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | col_low;
-  command_delay();
-  while (i--) // write 16 column
-  {
-    LCD_Data = data;
-    command_delay();
+  lcd_send_command(Set_Page_Addr_X | 4);
+  lcd_send_command(Set_ColH_Addr_X | col_high);
+  lcd_send_command(Set_ColL_Addr_X | col_low);
+
+  for (i = 0; i < 16; i++) {
+    lcd_send_data(0x00);
   }
 }
 
@@ -259,42 +211,28 @@ void LCD_Clr_Cursor() {
  * This function manages the cursor data, specifically on pages 3 and 4 of the RAM, and the column used varies based on the x-position.
  */
 void LCD_Set_Cursor(signed char x) {
-  unsigned char i = 16;
-  unsigned char data = 0xff;
-
-  unsigned char col_no; // 0x38+x
-  unsigned char col_high;
-  unsigned char col_low;
-  col_no = 0x40 + (x / 8 - 1) * 8; // 0x38+x
+  unsigned char i;
+  unsigned char col_no, col_high, col_low;
+  col_no = 0x40 + (x / 8 - 1) * 8;
   col_high = col_no >> 4;
   col_low = col_no & 0xf;
 
   // page 3
-  LCD_Command = Set_Page_Addr_X | 3;
-  command_delay();
-  // column diff with x-position
+  lcd_send_command(Set_Page_Addr_X | 3);
+  lcd_send_command(Set_ColH_Addr_X | col_high);
+  lcd_send_command(Set_ColL_Addr_X | col_low);
 
-  LCD_Command = Set_ColH_Addr_X | col_high;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | col_low;
-  command_delay();
-  while (i--) // write 16 column
-  {
-    LCD_Data = data;
-    command_delay();
+  for (i = 0; i < 16; i++) {
+    lcd_send_data(0xff);
   }
-  i = 16;
+
   // page 4
-  LCD_Command = Set_Page_Addr_X | 4;
-  command_delay();
-  LCD_Command = Set_ColH_Addr_X | col_high;
-  command_delay();
-  LCD_Command = Set_ColL_Addr_X | col_low;
-  command_delay();
-  while (i--) // write 16 columns
-  {
-    LCD_Data = data;
-    command_delay();
+  lcd_send_command(Set_Page_Addr_X | 4);
+  lcd_send_command(Set_ColH_Addr_X | col_high);
+  lcd_send_command(Set_ColL_Addr_X | col_low);
+
+  for (i = 0; i < 16; i++) {
+    lcd_send_data(0xff);
   }
 }
 
@@ -302,26 +240,23 @@ void LCD_Set_Cursor(signed char x) {
  * @brief Powers on the LCD.
  */
 void LCD_PowerOn(void) {
-  LCD_Command = 0x2c;
-  command_delay();
-  LCD_Command = 0x2e;
-  command_delay();
-  LCD_Command = 0x2f;
-  command_delay();
+  lcd_send_command(0x2c);
+  lcd_send_command(0x2e);
+  lcd_send_command(0x2f);
 }
 
 /**
  * @brief Enables the Display.
  */
 void LCD_DisplayOn(void) {
-  LCD_Command = Display_On;
+  lcd_send_command(Display_On);
 }
 
 /**
  * @brief Disables the Display.
  */
 void LCD_DisplayOff(void) {
-  LCD_Command = Display_Off;
+  lcd_send_command(Display_On);
 }
 
 // clang-format off
