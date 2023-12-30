@@ -39,14 +39,16 @@ void loop() {
   }
 }
 
+// This function turns on LED2 if DEBUG is true.
 void on_tim6(void) {
-  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 }
 
-void on_user_button_press(void) {
-  is_bottom_pressed = 1;
-  printf("button_pressed\r\n");
+// This function turns on LED3 if DEBUG is true.
+void on_button_press(void) {
+  if (HAL_GPIO_ReadPin(User_Button_GPIO_Port, User_Button_Pin) == GPIO_PIN_RESET)
+    // TODO
+  else if (HAL_GPIO_ReadPin(JOY_SEL_GPIO_Port, JOY_SEL_Pin) == GPIO_PIN_RESET)
+    // TODO
 }
 
 void handle_init_state(void) {

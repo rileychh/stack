@@ -3,10 +3,19 @@
 
 #include "stm32f1xx_hal.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 // Configuration
+
+#define DEBUG true
+
+#if DEBUG
+#define debug_printf(...) printf(__VA_ARGS__)
+#else
+#define debug_printf(...)
+#endif
 
 #define CONSOLE_WIDTH 80
 
@@ -44,7 +53,7 @@ void on_tim6(void);
  * or the `JOY_SEL` (Pressing down the joystick)
  * triggers EXTI10, in which triggers this function.
  */
-void on_user_button_press(void);
+void on_button_press(void);
 
 // Private functions
 
