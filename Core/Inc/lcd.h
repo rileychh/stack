@@ -52,7 +52,6 @@ void delay(volatile unsigned long length);
 #define reset_delay() delay(0xff)
 #define power_delay() delay(0x4ffff)
 
-void LCD_Draw_ST_Logo(void);
 void LCD_Reset_Cursor(void);
 void LCD_Clr_Cursor(void);
 void LCD_Set_Cursor(signed char x);
