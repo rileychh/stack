@@ -19,12 +19,7 @@ void glcd_data(char data) {
 }
 
 void glcd_pixel(unsigned char x, unsigned char y, unsigned char colour) {
-
-  if (x > SCREEN_WIDTH || y > SCREEN_HEIGHT) return;
-
-  // Real screen coordinates are 0-63, not 1-64.
-  x -= 1;
-  y -= 1;
+  if (x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT) return;
 
   unsigned short array_pos = x + ((y / 8) * 128);
 

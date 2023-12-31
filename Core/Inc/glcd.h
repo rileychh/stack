@@ -121,8 +121,8 @@ void glcd_blank(void);
 /**
  * Set a single pixel
  *
- * @param x 		The x position, from 1 - SCREEN_WIDTH
- * @param y 		The y position, from 1 - SCREEN_HEIGHT
+ * @param x 		The x position, from 0 - SCREEN_WIDTH-1
+ * @param y 		The y position, from 0 - SCREEN_HEIGHT-1
  * @param colour 	0 = OFF, any other value = ON
  */
 void glcd_pixel(unsigned char x, unsigned char y, unsigned char colour);
