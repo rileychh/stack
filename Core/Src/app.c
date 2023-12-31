@@ -100,23 +100,13 @@ void handle_init_state(void) {
   await_button(BTN_KEY, draw_gauge_needle);
   glcd_blank();
 
-  //  LCD_DrawString(6, 45, "3", 1);
-  draw_text("3", 63, 31, (unsigned char *)ArialBlack14, 0);
-  glcd_refresh();
-  HAL_Delay(1000);
-  glcd_blank();
-  draw_text("2", 63, 31, (unsigned char *)ArialBlack14, 0);
-  glcd_refresh();
-  HAL_Delay(1000);
-  glcd_blank();
-  draw_text("1", 63, 31, (unsigned char *)ArialBlack14, 0);
-  glcd_refresh();
-  HAL_Delay(1000);
-  glcd_blank();
-  draw_text("GO", 63, 31, (unsigned char *)ArialBlack14, 0);
-  glcd_refresh();
-  HAL_Delay(1000);
-  glcd_blank();
+  char *countdown[] = {"3", "2", "1", "GO", NULL};
+  for (uint8_t i = 0; countdown[i] != NULL; i++) {
+    draw_text(countdown[i], 63, 31, (unsigned char *)ArialBlack14, 0);
+    glcd_refresh();
+    HAL_Delay(1000);
+    glcd_blank();
+  }
   state = STATE_PLAYING;
 }
 
