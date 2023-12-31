@@ -49,7 +49,7 @@ for i, chunk in enumerate(split_by_n(lcd_array.flatten(), 16)):
     # Convert the lcd_array to a C unsigned char array
     formatted_chunk = ", ".join(f"0x{b:02x}" for b in chunk) + ","
     if i % 8 == 0:
-        lines.append(f"// Bank {i // 8}")
+        lines.append(f"// Page {i // 8}")
     lines.append(formatted_chunk)
 
 result = "\n".join(lines) + "\n"
