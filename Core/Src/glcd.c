@@ -35,6 +35,27 @@ void glcd_pixel(unsigned char x, unsigned char y, unsigned char colour) {
   }
 }
 
+void glcd_column(unsigned char page, unsigned char column, unsigned char colours) {
+  if (page >= 8 || column >= SCREEN_WIDTH) return;
+
+  unsigned short array_pos = page * 128 + column;
+
+#ifdef ST7565_DIRTY_PAGES
+#warning ** ST7565_DIRTY_PAGES enabled, only changed pages will be written to the GLCD **
+  glcd_dirty_pages |= 1 << page;
+#endif
+
+  glcd_buffer[array_pos] = colours;
+}
+
+void glcd_page(unsigned char page, unsigned char *data) {
+  if (page >= 8) return;
+
+  for (uint8_t column = 0; column < SCREEN_WIDTH; column++) {
+    glcd_column(page, column, data[column]);
+  }
+}
+
 void glcd_blank() {
   // Reset the internal buffer
   for (int n = 1; n <= (SCREEN_WIDTH * SCREEN_HEIGHT / 8) - 1; n++) {
