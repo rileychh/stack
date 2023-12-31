@@ -1,9 +1,9 @@
 #include "app.h"
 
-#include "Fonts/font_arialblack.h"
+#include "Res/font_arialblack.h"
+#include "Res/glcd_images.h"
 #include "glcd.h"
 #include "graphics.h"
-#include "lcd.h"
 #include "main.h"
 #include "uart_stdio.h"
 
@@ -105,13 +105,16 @@ void handle_init_state(void) {
   glcd_refresh();
   HAL_Delay(1000);
   glcd_blank();
-  LCD_DrawString(6, 45, "2", 1);
+  draw_text("2", 63, 31, (unsigned char *)ArialBlack14, 0);
+  glcd_refresh();
   HAL_Delay(1000);
   glcd_blank();
-  LCD_DrawString(6, 45, "1", 1);
+  draw_text("1", 63, 31, (unsigned char *)ArialBlack14, 0);
+  glcd_refresh();
   HAL_Delay(1000);
   glcd_blank();
-  LCD_DrawString(6, 45, "GO", 2);
+  draw_text("GO", 63, 31, (unsigned char *)ArialBlack14, 0);
+  glcd_refresh();
   HAL_Delay(1000);
   glcd_blank();
   state = STATE_PLAYING;
@@ -168,7 +171,8 @@ void handle_playing_state(void) {
 
 void handle_paused_state(void) {
   glcd_blank();
-  LCD_DrawString(6, 45, "PAUSED", 6);
+  draw_text("PAUSED", 63, 31, (unsigned char *)ArialBlack14, 2);
+  glcd_refresh();
   await_button(BTN_KEY, NULL);
   state = STATE_PLAYING;
 }
