@@ -59,4 +59,8 @@ void LCD_Reset_Cursor(void);
 void LCD_Clr_Cursor(void);
 void LCD_Set_Cursor(signed char x);
 
+// Image ROMs
+extern uint8_t SPLASH_SCREEN[];
+extern uint8_t SPEED_GAUGE[];
+
 #endif /* __LCD_H */
