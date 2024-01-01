@@ -9,7 +9,11 @@
 
 // Configuration
 
-#define DEBUG true
+#define DEBUG false
+/** Starting brick is 3/4 of the screen width */
+#define DEFAULT_BRICK_WIDTH (SCREEN_WIDTH * 3 / 4)
+/** Starting brick is in the middle of the screen */
+#define DEFAULT_BRICK_POSITION ((SCREEN_WIDTH - DEFAULT_BRICK_WIDTH) / 2)
 
 #if DEBUG
 #define debug_printf(...) printf(__VA_ARGS__)
@@ -21,20 +25,23 @@
 
 // Enums and Structs
 
-typedef enum {
-  STATE_INIT,
-  STATE_PLAYING,
-  STATE_PAUSED,
-} GameState;
-
 /** Viewable bricks of the stack. */
 typedef struct {
-  /** The horizontal coordinate of the beginning of the brick */
-  uint8_t position;
+  /** The horizontal coordinate of the beginning of the brick.
+   *  Can be negative to represent the invisible parts of the display.
+   */
+  int8_t position;
   /** The width of the brick in pixels */
   uint8_t width;
 } Brick;
 
+/** Moving direction of newly spawned brick. */
+typedef enum {
+  TO_RIGHT,
+  TO_LEFT,
+} BrickDirection;
+
+/** Port, pin and active_state about a button used by the await_button function. */
 typedef struct {
   GPIO_TypeDef *port;
   uint16_t pin;
@@ -45,6 +52,9 @@ typedef enum {
   BTN_NONE = 0,
   BTN_KEY,
   BTN_JOY,
+  /** Value to listen to any button pressed above.
+   *  Also represents the number of buttons.
+   */
   BTN_ANY,
 } GameButton;
 
@@ -78,21 +88,21 @@ void on_tim7(void);
  */
 void on_button_press(void);
 
-// Game state handlers
+// Game tasks
 
-void handle_init_state(void);
-void handle_playing_state(void);
-void handle_paused_state(void);
+/** Task while selecting difficulty and waiting for button press. */
+void draw_gauge_needle(void);
 
-// Game utilities
+void move_brick(void);
 
-int brick_place(void);
-void brick_spawning(void);
+void place_brick(void);
 
-/**
- * Display the bricks on the LCD page 3 through 7.
- */
+/** Display the bricks on the LCD page 3 through 7. */
 void display_bricks(void);
+
+void pause_game(void);
+
+void reset_game(void);
 
 // Hardware utilities
 

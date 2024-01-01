@@ -19,22 +19,24 @@ const char *GAME_BANNER =
   "               _|_|_|        _|_|    _|_|_|    _|_|_|  _|    _|\r\n"
   "                   Copyright (C) 2023 Arthur, Riley and Wei    \r\n";
 
-GameState state;    // State of the game
-uint8_t difficulty; // Speed of the moving brick
-size_t score;       // Number of bricks placed
-GameButtonInfo button_info[4];
-
-/** [0] is the moving brick, while [4] is the bottom most brick. */
-Brick bricks[5];
+uint16_t difficulty = 0;                   // Speed of the moving brick, increases over time
+uint16_t score = 0;                        // Number of bricks placed, up to 999
+bool game_over = false;                    // Whether to continue the game
+GameButtonInfo button_info[BTN_ANY];       // Info used by await button()
+Brick bricks[5];                           // [0] is the moving brick, while [4] is the bottom most brick
+Brick *current_brick = &bricks[3];         // Current (moving) brick is above last brick
+BrickDirection brick_direction = TO_RIGHT; // First brick enters from the left of the display
+bool tick = true;                          // Game tick toggled by TIM7
 
 volatile GameButton button_pressed = BTN_NONE;
 
 void setup() {
+  HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim7);
+
   glcd_init();
   glcd_blank();
 
-  score = 0;
-  state = STATE_INIT;
   button_info[BTN_KEY].port = User_Button_GPIO_Port;
   button_info[BTN_KEY].pin = User_Button_Pin;
   button_info[BTN_KEY].active_state = GPIO_PIN_RESET;
@@ -43,50 +45,10 @@ void setup() {
   button_info[BTN_JOY].pin = JOY_SEL_Pin;
   button_info[BTN_JOY].active_state = GPIO_PIN_RESET;
 
-  HAL_TIM_Base_Start_IT(&htim6);
+  reset_game();
 }
 
 void loop() {
-  switch (state) {
-  case STATE_INIT: handle_init_state(); break;
-  case STATE_PLAYING: handle_playing_state(); break;
-  case STATE_PAUSED: handle_paused_state(); break;
-  }
-}
-
-// This function turns on LED2 if DEBUG is true.
-// Interval: 1s
-void on_tim6(void) {
-}
-
-// This function turns on LED3 if DEBUG is true.
-// Interval: 1ms
-void on_tim7(void) {
-}
-
-// This function turns on LED4 if DEBUG is true.
-void on_button_press(void) {
-  if (button_pressed == BTN_NONE) {
-    if (HAL_GPIO_ReadPin(User_Button_GPIO_Port, User_Button_Pin) == GPIO_PIN_RESET)
-      button_pressed = BTN_KEY;
-    else if (HAL_GPIO_ReadPin(JOY_SEL_GPIO_Port, JOY_SEL_Pin) == GPIO_PIN_RESET)
-      button_pressed = BTN_JOY;
-  }
-}
-
-/** Task while selecting difficulty and waiting for button press. */
-void draw_gauge_needle() {
-  difficulty = read_adc() >> 5; // Map ADC value (0 - 4095) to LCD x position (0 - 127)
-  glcd_page(3, SPEED_GAUGE); // The gauge
-
-  // Draw a 3px wide needle
-  for (int column = difficulty - 1; column <= difficulty + 1; column++) {
-    glcd_column(3, column, 0xff);
-  }
-  glcd_refresh();
-}
-
-void handle_init_state(void) {
   puts(GAME_BANNER);
   centered_puts("Press [Key] to start the game", CONSOLE_WIDTH);
   for (uint8_t page = 0; page < 8; page++) {
@@ -97,7 +59,10 @@ void handle_init_state(void) {
   await_button(BTN_KEY, NULL);
   glcd_blank();
 
-  centered_puts("Spin the nob to adjust the speed and difficulty", CONSOLE_WIDTH);
+  puts("");
+  centered_puts("DIFFICULTY SELECTION", CONSOLE_WIDTH);
+  puts("[Arrow] Adjust the starting difficulty");
+  puts("[Key] Confirm and start the game");
 
   // Display the speed gauge UI on the LCD
   glcd_page(4, SPEED_GAUGE + 128); // The "V [key]" prompt
@@ -105,6 +70,12 @@ void handle_init_state(void) {
   await_button(BTN_KEY, draw_gauge_needle);
   glcd_blank();
 
+  debug_printf("The difficulty is set to %u\r\n", difficulty);
+
+  puts("");
+  centered_puts("GAME START", CONSOLE_WIDTH);
+  puts("[Joy] Place a brick onto the stack");
+  puts("[Key] Pause the game");
   char *countdown[] = {"3", "2", "1", "GO", NULL};
   for (uint8_t i = 0; countdown[i] != NULL; i++) {
     draw_text(countdown[i], 63, 31, (unsigned char *)ArialBlack14, 0);
@@ -112,120 +83,238 @@ void handle_init_state(void) {
     HAL_Delay(1000);
     glcd_blank();
   }
-  state = STATE_PLAYING;
+
+  do {
+    // Find where the last brick is from top to bottom
+    Brick *last_brick = &bricks[4]; // Default to the bottom
+    for (uint8_t i = 1; i < 5; i++) {
+      if (bricks[i].width != 0) {
+        last_brick = &bricks[i];
+        break;
+      }
+    }
+
+    // Current brick is above the last brick
+    current_brick = last_brick - 1;
+
+    // Spawn a new brick
+    current_brick->width = last_brick->width;
+    if (brick_direction == TO_RIGHT) {
+      current_brick->position = 1 - current_brick->width;
+    } else { // TO_LEFT
+      current_brick->position = SCREEN_WIDTH - 1;
+    }
+    debug_printf(
+      "Spawning a %upx wide brick at %d\r\n",
+      current_brick->width,
+      current_brick->position
+    );
+
+    switch (await_button(BTN_ANY, move_brick)) {
+    case BTN_JOY:
+      place_brick();
+      break;
+    case BTN_KEY:
+      pause_game();
+      break;
+    default: break;
+    }
+  } while (!game_over);
+
+  puts("");
+  centered_puts("GAME OVER", CONSOLE_WIDTH);
+  printf(
+    "You stacked %u bricks. %s\r\n",
+    score,
+    score > 10 ? "Good Job!" : "\r\nTip: you have to look at the display to get a high score."
+  );
+
+  // TODO Leaderboard
+
+  // Reset game state
+  reset_game();
 }
 
-void handle_playing_state(void) {
-  // Initialize the bricks
-  for (int i = 0; i < 5; i++) {
-    bricks[i] = (Brick) {0};
+// This function turns on LED2 if DEBUG is true.
+// Interval: 250ms
+void on_tim6() {
+}
+
+// This function turns on LED3 if DEBUG is true.
+// Interval: 50us
+void on_tim7() {
+  static int counter = 0;
+  int tick_interval = 512 - difficulty * 2;
+  if (tick_interval < 0) tick_interval = 0;
+
+  if (counter >= tick_interval) {
+    tick = true;
+    counter = 0;
+  }
+  counter++;
+}
+
+// This function turns on LED4 if DEBUG is true.
+void on_button_press() {
+  if (button_pressed == BTN_NONE) {
+    if (HAL_GPIO_ReadPin(User_Button_GPIO_Port, User_Button_Pin) == GPIO_PIN_RESET)
+      button_pressed = BTN_KEY;
+    else if (HAL_GPIO_ReadPin(JOY_SEL_GPIO_Port, JOY_SEL_Pin) == GPIO_PIN_RESET)
+      button_pressed = BTN_JOY;
+  }
+}
+
+void draw_gauge_needle() {
+  difficulty = read_adc() >> 5; // Map ADC value (0 - 4095) to horizontal position (0 - 127)
+  glcd_page(3, SPEED_GAUGE);    // The gauge
+
+  // Draw a 3px wide needle
+  for (int column = difficulty - 1; column <= difficulty + 1; column++) {
+    glcd_column(3, column, 0xff);
+  }
+  glcd_refresh();
+}
+
+void move_brick() {
+  if (!tick) return;
+
+  if (current_brick->position >= SCREEN_WIDTH - 1) {
+    brick_direction = TO_LEFT;
+  } else if (current_brick->position <= 1 - current_brick->width) {
+    brick_direction = TO_RIGHT;
   }
 
-  bricks[0].position = 0;
-  bricks[0].width = 16;
+  if (brick_direction == TO_RIGHT) {
+    current_brick->position++;
+  } else { // TO_LEFT
+    current_brick->position--;
+  }
 
-  bricks[1].position = 0;
-  bricks[1].width = 17;
-
-  bricks[2].position = 0;
-  bricks[2].width = 18;
-
-  bricks[3].position = 0;
-  bricks[3].width = 19;
-
-  bricks[4].position = 0;
-  bricks[4].width = 20;
+  debug_printf(
+    "Moved brick %s to %d\r\n",
+    brick_direction == TO_RIGHT ? "right" : "left",
+    current_brick->position
+  );
 
   display_bricks();
-#if 0
-  LCD_Clear();
-  bool is_placed = true;
-  while (is_placed) {
-    score += 1;
-    // TODO 生成磚塊
-    // function of brick_spawning
-    is_bottom_pressed = 0;
-    brick_spawning();
-
-    // TODO 偵測按鈕是否被按下 放置磚塊 是否放置成功 否 把 is_placed 調成 0
-    // function of brick_place return type integer
-    // is_placed = brick_place();
-  }
-
-  // 離開迴圈即失敗
-
-  centered_puts("GAME OVER", CONSOLE_WIDTH);
-  HAL_Delay(1000);
-  // TODO printout the score at the middle of the screen
-  centered_puts("Score: ", CONSOLE_WIDTH);
-  HAL_Delay(10000);
-  LCD_Clear();
-  // TODO 初始化設定 或 儲存紀錄 讓玩家進入第二次遊玩
-#endif
+  tick = false;
 }
 
-void handle_paused_state(void) {
-  glcd_blank();
-  draw_text("PAUSED", 63, 31, (unsigned char *)ArialBlack14, 2);
-  glcd_refresh();
-  await_button(BTN_KEY, NULL);
-  state = STATE_PLAYING;
+void place_brick() {
+  debug_printf("Placed a brick\r\n");
+
+  // Cut the brick to fit above the last brick.
+  // They have the same width, so we only have to check the position.
+  Brick *last_brick = current_brick + 1;
+  int8_t current_start = current_brick->position,
+         current_end = current_start + current_brick->width,
+         last_start = last_brick->position,
+         last_end = last_start + last_brick->width;
+
+  if (current_end <= last_start || current_start >= last_end) {
+    // Did not overlap with the last brick
+    game_over = true;
+    return;
+
+  } else if (current_start < last_start) {
+    // Placed to the left of the last brick
+    current_brick->width -= last_start - current_start;
+    current_brick->position = last_start;
+
+  } else if (current_start > last_start) {
+    // Placed to the right of the last brick
+    current_brick->width -= current_start - last_start;
+
+  } else {
+    // Placed on top of the last brick
+    puts("PERFECT placement!");
+    score++; // Get an extra point
+
+    // Grow the current brick
+    current_brick->position--;
+    current_brick->width += 2;
+  }
+
+  // Move the stack down by one if stacked to the top
+  if (current_brick == &bricks[0]) {
+    for (int i = 4; i > 0; i--) {
+      bricks[i] = bricks[i - 1];
+    }
+    bricks[0] = (Brick) {0};
+  }
+
+  // Alternate the incoming direction of the bricks
+  if (brick_direction == TO_RIGHT) brick_direction = TO_LEFT;
+  else /* TO_LEFT */ brick_direction = TO_RIGHT;
+
+  score++;
+  difficulty += 2;
 }
-
-#if 0
-int x_position, y_position, is_bottom_pressed;
-
-void brick_spawning(void) {
-  x_position = 1;
-  y_position = 0;
-  is_bottom_pressed = 0;
-  while (y_position < 85 && !is_bottom_pressed) {
-    LCD_DrawString(x_position, y_position, "xxxxx", 5);
-
-    HAL_Delay(500);
-    LCD_Clear();
-    y_position += 12;
-  }
-
-  while (y_position != 0 && !is_bottom_pressed) {
-    y_position -= 12;
-    LCD_DrawString(x_position, y_position, "xxxxx", 5);
-    HAL_Delay(500);
-    LCD_Clear();
-  }
-  if (is_bottom_pressed == 1) {
-    is_bottom_pressed = 0;
-    brick_place();
-  }
-}
-
-int brick_place(void) {
-  int flag = 1;
-  while (x_position <= 6) {
-    LCD_DrawString(x_position, y_position, "xxxxx", 5);
-    HAL_Delay(500);
-    LCD_Clear();
-    x_position += 1;
-  }
-
-  return flag;
-}
-#endif
 
 void display_bricks() {
   for (uint8_t i = 0; i < 5; i++) {
-    uint8_t page = i + 3;
-    uint8_t start = bricks[i].position, end = start + bricks[i].width;
+    uint8_t page = i + 3, start, end;
+
+    // Skip zero-width bricks
+    if (bricks[i].width == 0) continue;
+
+    // Check if the sides are out of bounds
+    bool is_left_oob = false, is_right_oob = false;
+
+    if (bricks[i].position >= 0)
+      start = bricks[i].position;
+    else {
+      start = 0;
+      is_left_oob = true;
+    }
+
+    if (bricks[i].position + bricks[i].width < SCREEN_WIDTH)
+      end = bricks[i].position + bricks[i].width;
+    else {
+      end = SCREEN_WIDTH - 1;
+      is_right_oob = true;
+    }
+
+    debug_printf("[%u: %u-%u] \r\n", i, start, end);
+
+    static unsigned char empty_page[SCREEN_WIDTH] = {0};
+    glcd_page(page, empty_page);
+
     for (uint8_t column = start; column <= end; column++) {
       uint8_t data;
-      if (column == start || column == end) data = 0xff; // left and right border
-      else if (column % 2) data = 0xab;                  // 0xaa but with bottom border
-      else data = 0xd5;                                  // 0x55 but with top border
+      if (
+        !is_left_oob && column == start ||
+        !is_right_oob && column == end
+      ) data = 0xff;                    // left and right border
+      else if (column % 2) data = 0xab; // 0xaa but with bottom border
+      else data = 0xd5;                 // 0x55 but with top border
       glcd_column(page, column, data);
     }
   }
 
+  debug_printf("\r\n");
   glcd_refresh();
+}
+
+void pause_game() {
+  glcd_blank();
+  draw_text("PAUSED", 63, 31, (unsigned char *)ArialBlack14, 2);
+  glcd_refresh();
+  await_button(BTN_KEY, NULL);
+  glcd_blank();
+}
+
+void reset_game(void) {
+  game_over = false;
+  score = 0;
+  brick_direction = TO_RIGHT;
+  tick = true;
+
+  for (int i = 0; i < 5; i++) {
+    bricks[i] = (Brick) {0};
+  }
+  bricks[4].width = DEFAULT_BRICK_WIDTH;
+  bricks[4].position = DEFAULT_BRICK_POSITION;
 }
 
 uint32_t read_adc() {
@@ -243,6 +332,7 @@ int centered_puts(const char *s, uint8_t width) {
   return puts(s);
 }
 
+/** Helper function to determine if a button is pressed. */
 bool is_pressed(GameButton target) {
   if (target == BTN_ANY) return button_pressed != BTN_NONE;
   return button_pressed == target;
@@ -254,7 +344,7 @@ GameButton await_button(GameButton target, void (*task)()) {
   while (!is_pressed(target)) {
     if (task) task();
   }
-  debug_printf("A button is pressed\r\n");
+  debug_printf("Button %u is pressed\r\n", button_pressed);
 
   GameButtonInfo btn = button_info[button_pressed];
   HAL_Delay(20); // Debounce
