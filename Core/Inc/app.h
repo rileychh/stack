@@ -27,9 +27,12 @@ typedef enum {
   STATE_PAUSED,
 } GameState;
 
+/** Viewable bricks of the stack. */
 typedef struct {
-  uint8_t position; // The horizontal coordinate of the beginning of the brick
-  uint8_t width;    // The width of the brick in pixels
+  /** The horizontal coordinate of the beginning of the brick */
+  uint8_t position;
+  /** The width of the brick in pixels */
+  uint8_t width;
 } Brick;
 
 typedef struct {

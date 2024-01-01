@@ -24,8 +24,7 @@ uint8_t difficulty; // Speed of the moving brick
 size_t score;       // Number of bricks placed
 GameButtonInfo button_info[4];
 
-// Viewable bricks of the stack
-// [0] is the moving brick, while [4] is the bottom most brick
+/** [0] is the moving brick, while [4] is the bottom most brick. */
 Brick bricks[5];
 
 volatile GameButton button_pressed = BTN_NONE;
@@ -69,15 +68,15 @@ void on_button_press(void) {
   }
 }
 
+/** Task while selecting difficulty and waiting for button press. */
 void draw_gauge_needle() {
-  const uint8_t page = 3;
   difficulty = read_adc() >> 5; // Map ADC value (0 - 4095) to LCD x position (0 - 127)
-  glcd_page(page, SPEED_GAUGE); // The gauge
+  glcd_page(3, SPEED_GAUGE); // The gauge
 
   // Draw a 3px wide needle
-  glcd_column(3, difficulty - 1, 0xff);
-  glcd_column(3, difficulty, 0xff);
-  glcd_column(3, difficulty + 1, 0xff);
+  for (int column = difficulty - 1; column <= difficulty + 1; column++) {
+    glcd_column(3, column, 0xff);
+  }
   glcd_refresh();
 }
 
@@ -213,9 +212,9 @@ void display_bricks() {
     uint8_t start = bricks[i].position, end = start + bricks[i].width;
     for (uint8_t column = start; column <= end; column++) {
       uint8_t data;
-      if (column == start || column == end) data = 0xff;
-      else if (column % 2) data = 0xab;
-      else data = 0xd5;
+      if (column == start || column == end) data = 0xff; // left and right border
+      else if (column % 2) data = 0xab;                  // 0xaa but with bottom border
+      else data = 0xd5;                                  // 0x55 but with top border
       glcd_column(page, column, data);
     }
   }
