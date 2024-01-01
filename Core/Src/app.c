@@ -55,10 +55,16 @@ void loop() {
 }
 
 // This function turns on LED2 if DEBUG is true.
+// Interval: 1s
 void on_tim6(void) {
 }
 
 // This function turns on LED3 if DEBUG is true.
+// Interval: 1ms
+void on_tim7(void) {
+}
+
+// This function turns on LED4 if DEBUG is true.
 void on_button_press(void) {
   if (button_pressed == BTN_NONE) {
     if (HAL_GPIO_ReadPin(User_Button_GPIO_Port, User_Button_Pin) == GPIO_PIN_RESET)

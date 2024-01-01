@@ -62,6 +62,14 @@ void loop(void);
 void on_tim6(void);
 
 /**
+ * @brief TIM7 Global Interrupt Service Routine
+ *
+ * This function runs every `htim7.Init.Period / 10` milliseconds.
+ * @see MX_TIM7_Init()
+ */
+void on_tim7(void);
+
+/**
  * @brief EXTI line[15:10] Interrupts Service Routine
  *
  * Pressing the `User_Button` (Labeled "Key" on the PCB)
@@ -114,6 +122,6 @@ GameButton await_button(GameButton target, void (*task)());
 
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
-extern TIM_HandleTypeDef htim6;
+extern TIM_HandleTypeDef htim6, htim7;
 
 #endif // !APP_H
