@@ -17,7 +17,7 @@ const char *GAME_BANNER =
   "                 _|_|      _|      _|    _|  _|        _|_|    \r\n"
   "                     _|    _|      _|    _|  _|        _|  _|  \r\n"
   "               _|_|_|        _|_|    _|_|_|    _|_|_|  _|    _|\r\n"
-  "                   Copyright (C) 2023 Arthur, Riley and Wei    \r\n";
+  "                   Copyright (C) 2024 Arthur, Riley and Wei    \r\n";
 
 uint16_t difficulty = 0;                   // Speed of the moving brick, increases over time
 uint16_t score = 0;                        // Number of bricks placed, up to 999
