@@ -201,8 +201,6 @@ void move_brick() {
 }
 
 void place_brick() {
-  debug_printf("Placed a brick\r\n");
-
   // Cut the brick to fit above the last brick.
   // They have the same width, so we only have to check the position.
   Brick *last_brick = current_brick + 1;

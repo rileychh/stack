@@ -16,11 +16,14 @@
 #define DEFAULT_BRICK_POSITION ((SCREEN_WIDTH - DEFAULT_BRICK_WIDTH) / 2)
 
 #if DEBUG
+/** printf that only activates in debug */
 #define debug_printf(...) printf(__VA_ARGS__)
 #else
+/** printf that only activates in debug. */
 #define debug_printf(...)
 #endif
 
+/** UART console width for centering text. */
 #define CONSOLE_WIDTH 80
 
 // Enums and Structs
@@ -41,13 +44,9 @@ typedef enum {
   TO_LEFT,
 } BrickDirection;
 
-/** Port, pin and active_state about a button used by the await_button function. */
-typedef struct {
-  GPIO_TypeDef *port;
-  uint16_t pin;
-  GPIO_PinState active_state;
-} GameButtonInfo;
-
+/** Represents a button, no button, or any button.
+ *  Used by the await_button function.
+ */
 typedef enum {
   BTN_NONE = 0,
   BTN_KEY,
@@ -58,9 +57,19 @@ typedef enum {
   BTN_ANY,
 } GameButton;
 
+/** Port, pin and active_state about a button used by the await_button function. */
+typedef struct {
+  GPIO_TypeDef *port;
+  uint16_t pin;
+  GPIO_PinState active_state;
+} GameButtonInfo;
+
 // Public functions
 
+/** Code to run once at the start of the program. */
 void setup(void);
+
+/** Code to run repeatedly until hard reset. */
 void loop(void);
 
 /**
@@ -74,7 +83,7 @@ void on_tim6(void);
 /**
  * @brief TIM7 Global Interrupt Service Routine
  *
- * This function runs every `htim7.Init.Period / 10` milliseconds.
+ * This function runs every `htim7.Init.Period` microseconds.
  * @see MX_TIM7_Init()
  */
 void on_tim7(void);
@@ -93,15 +102,23 @@ void on_button_press(void);
 /** Task while selecting difficulty and waiting for button press. */
 void draw_gauge_needle(void);
 
+/** Task while waiting for player to place a brick. */
 void move_brick(void);
 
+/** Cut the current brick,
+ *  move the stack if needed,
+ *  alternate brick direction
+ *  and increase the score and difficulty.
+ */
 void place_brick(void);
 
 /** Display the bricks on the LCD page 3 through 7. */
 void display_bricks(void);
 
+/** Blank the LCD and show "PAUSED" on the display and wait for unpause. */
 void pause_game(void);
 
+/** Prepare game global variables for a new game. */
 void reset_game(void);
 
 // Hardware utilities
@@ -122,8 +139,9 @@ int centered_puts(const char *s, uint8_t width);
 
 /**
  * Detect for button presses by resetting a global variable, and wait for changes from the ISR.
+ * The function will return when the button is released.
  * @param target The button to wait for. Use BTN_ANY to detect multiple buttons.
- * @param task Task to do while waiting for button press.
+ * @param task Task to do while waiting for button press. This won't be called when waiting for release.
  * @return The button pressed.
  */
 GameButton await_button(GameButton target, void (*task)());
