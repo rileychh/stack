@@ -24,7 +24,7 @@ uint16_t score = 0;                        // Number of bricks placed, up to 999
 bool game_over = false;                    // Whether to continue the game
 GameButtonInfo button_info[BTN_ANY];       // Info used by await button()
 Brick bricks[5];                           // [0] is the moving brick, while [4] is the bottom most brick
-Brick *current_brick = &bricks[3];         // Current (moving) brick is above last brick
+Brick *current_brick = &bricks[3];         // Current (moving) brick is 1 page above the last brick
 BrickDirection brick_direction = TO_RIGHT; // First brick enters from the left of the display
 bool tick = true;                          // Game tick toggled by TIM7
 

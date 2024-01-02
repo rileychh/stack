@@ -138,7 +138,7 @@ void glcd_column(unsigned char page, unsigned char column, unsigned char colours
 /**
  * Write to all columns of a page.
  * @param page The page number, from 0 - 7
- * @param data An array of the length SCREEN_WIDTH containing all columns
+ * @param data An array with a length equal to SCREEN_WIDTH, containing all columns.
  */
 void glcd_page(unsigned char page, unsigned char *data);
 
