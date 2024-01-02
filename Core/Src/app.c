@@ -298,6 +298,10 @@ void pause_game() {
   glcd_blank();
   draw_text("PAUSED", 63, 31, (unsigned char *)ArialBlack14, 2);
   glcd_refresh();
+
+  // Clear the current brick to correct last brick detection
+  *current_brick = (Brick) {0};
+
   await_button(BTN_KEY, NULL);
   glcd_blank();
 }
