@@ -347,11 +347,11 @@ bool is_pressed(GameButton target) {
 }
 
 GameButton await_button(GameButton target, void (*task)()) {
-  button_pressed = BTN_NONE;
-
-  while (!is_pressed(target)) {
+  do {
+    button_pressed = BTN_NONE;
     if (task) task();
-  }
+  } while (!is_pressed(target));
+
   debug_printf("Button %u is pressed\r\n", button_pressed);
 
   GameButtonInfo btn = button_info[button_pressed];
