@@ -78,7 +78,7 @@ void loop() {
   puts("[Key] Pause the game");
   char *countdown[] = {"3", "2", "1", "GO", NULL};
   for (uint8_t i = 0; countdown[i] != NULL; i++) {
-    draw_text(countdown[i], 63, 31, (unsigned char *)ArialBlack14, 0);
+    centered_draw_text(countdown[i], ArialBlack16, 0);
     glcd_refresh();
     HAL_Delay(1000);
     glcd_blank();
@@ -297,7 +297,7 @@ void display_bricks() {
 
 void pause_game() {
   glcd_blank();
-  draw_text("PAUSED", 63, 31, (unsigned char *)ArialBlack14, 2);
+  centered_draw_text("PAUSED", ArialBlack16, 4);
   glcd_refresh();
 
   // Clear the current brick to correct last brick detection
