@@ -138,6 +138,14 @@ uint32_t read_adc(void);
 int centered_puts(const char *s, uint8_t width);
 
 /**
+ * Print a line centered in the LCD.
+ * @param string The string to draw.
+ * @param font The font used to measure the center and to draw the text.
+ * @param spacing The gap in pixels between letters
+ */
+void centered_draw_text(char *string, const unsigned char *font, unsigned char spacing);
+
+/**
  * Detect for button presses by resetting a global variable, and wait for changes from the ISR.
  * The function will return when the button is released.
  * @param target The button to wait for. Use BTN_ANY to detect multiple buttons.

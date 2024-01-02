@@ -334,6 +334,12 @@ int centered_puts(const char *s, uint8_t width) {
   return puts(s);
 }
 
+void centered_draw_text(char *string, const unsigned char *font, unsigned char spacing) {
+  unsigned char x = (SCREEN_WIDTH - text_width(string, font, spacing)) / 2;
+  unsigned char y = (SCREEN_HEIGHT - text_height(string, font)) / 2;
+  draw_text(string, x, y, font, spacing);
+}
+
 /** Helper function to determine if a button is pressed. */
 bool is_pressed(GameButton target) {
   if (target == BTN_ANY) return button_pressed != BTN_NONE;
