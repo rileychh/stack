@@ -3,7 +3,7 @@
 
 #include "graphics.h"
 
-bounding_box_t draw_text(char *string, unsigned char x, unsigned char y, unsigned char *font, unsigned char spacing) {
+bounding_box_t draw_text(char *string, unsigned char x, unsigned char y, const unsigned char *font, unsigned char spacing) {
 	bounding_box_t ret;
 	bounding_box_t tmp;
 
@@ -26,7 +26,7 @@ bounding_box_t draw_text(char *string, unsigned char x, unsigned char y, unsigne
 	return ret;
 }
 
-bounding_box_t draw_char(unsigned char c, unsigned char x, unsigned char y, unsigned char *font) {
+bounding_box_t draw_char(unsigned char c, unsigned char x, unsigned char y, const unsigned char *font) {
 	unsigned short pos;
 	unsigned char width;
 	bounding_box_t ret;
@@ -83,7 +83,7 @@ bounding_box_t draw_char(unsigned char c, unsigned char x, unsigned char y, unsi
 	return ret;
 }
 
-unsigned char text_height(unsigned char *string, unsigned char *font) {
+unsigned char text_height(char *string, const unsigned char *font) {
 	// TODO: Possibly work out the actual pixel height.  Letters with
 	//       descenders (like 'g') are taller than letters without (like 'k')
 
@@ -91,7 +91,7 @@ unsigned char text_height(unsigned char *string, unsigned char *font) {
 	return font[FONT_HEADER_HEIGHT];
 }
 
-unsigned char text_width(unsigned char *string, unsigned char *font, unsigned char spacing) {
+unsigned char text_width(char *string, const unsigned char *font, unsigned char spacing) {
 	unsigned char width = 0;
 	unsigned short pos;
 	unsigned char c;

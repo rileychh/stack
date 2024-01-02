@@ -61,7 +61,7 @@ typedef struct {
  * @param font		The font used to render the text
  * @param spacing	The gap in pixels between letters
  */
-bounding_box_t draw_text(char *string, unsigned char x, unsigned char y, unsigned char *font, unsigned char spacing);
+bounding_box_t draw_text(char *string, unsigned char x, unsigned char y, const unsigned char *font, unsigned char spacing);
 
 /**
  * Draw a single character on the screen at a specific location.
@@ -71,7 +71,7 @@ bounding_box_t draw_text(char *string, unsigned char x, unsigned char y, unsigne
  * @param y			The y position, from 1 - SCREEN_HEIGHT
  * @param font		The font used to render the text
  */
-bounding_box_t draw_char(unsigned char c, unsigned char x, unsigned char y, unsigned char *font);
+bounding_box_t draw_char(unsigned char c, unsigned char x, unsigned char y, const unsigned char *font);
 
 /**
  * Draw a simple rectangle.
@@ -103,7 +103,7 @@ void draw_box(int x1, int y1, int x2, int y2, char colour);
  * @param font		The font used to render the text
  * @param spacing	The gap between letters, in pixels
  */
-unsigned char text_width(unsigned char *string, unsigned char *font, unsigned char spacing);
+unsigned char text_width(char *string, const unsigned char *font, unsigned char spacing);
 
 /**
  * Obtain the height of a string in pixels.  
@@ -115,7 +115,7 @@ unsigned char text_width(unsigned char *string, unsigned char *font, unsigned ch
  * @param string	The text to be measured
  * @param font		The font used to render the text
  */
-unsigned char text_height(unsigned char *string, unsigned char *font);
+unsigned char text_height(char *string, const unsigned char *font);
 
 /**
  * Draw a line using Bresenham's algorithm.
