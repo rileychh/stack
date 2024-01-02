@@ -124,8 +124,9 @@ void loop() {
   puts("");
   centered_puts("GAME OVER", CONSOLE_WIDTH);
   printf(
-    "You stacked %u bricks. %s\r\n",
+    "You stacked %u brick%s. %s\r\n",
     score,
+    score == 1 ? "" : "s",
     score > 10 ? "Good Job!" : "\r\nTip: you have to look at the display to get a high score."
   );
 
