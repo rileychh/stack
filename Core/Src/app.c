@@ -9,6 +9,7 @@
 #include "uart_stdio.h"
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 const char *GAME_BANNER =
@@ -29,6 +30,7 @@ Brick *current_brick = &bricks[3];         // Current (moving) brick is 1 page a
 BrickDirection brick_direction = TO_RIGHT; // First brick enters from the left of the display
 bool game_tick = true;                     // Game tick toggled by TIM7
 bool needs_refresh = true;                 // Display refresh tick toggled by TIM10
+uint8_t duty_cycles[4] = {0};              // PWM duty cycles for the LEDs
 
 volatile GameButton button_pressed = BTN_NONE;
 
@@ -164,6 +166,20 @@ void on_tim2() {
 
 // This function turns on LED2 if DEBUG is true.
 void on_tim6() {
+#if !DEBUG // PWM is disabled in debug mode
+  static int pwm_counter = 0;
+
+  // Set the duty cycle of LED1 to LED4
+  for (int i = 0; i < 4; i++) {
+    if (pwm_counter < duty_cycles[i]) {
+      HAL_GPIO_WritePin(GPIOF, (uint16_t)0x40 << i, GPIO_PIN_SET);
+    } else {
+      HAL_GPIO_WritePin(GPIOF, (uint16_t)0x40 << i, GPIO_PIN_RESET);
+    }
+  }
+
+  pwm_counter = (pwm_counter + 1) % 100;
+#endif
 }
 
 // This function turns on LED3 if DEBUG is true.
@@ -328,6 +344,15 @@ void display_bricks() {
 #else
   glcd_refresh();
 #endif
+
+  // Sync the LEDs to the position of the brick
+  int16_t brick_center = current_brick->position + current_brick->width / 2;
+  uint8_t anchors[4] = {127, 96, 63, 0};
+  for (int i = 0; i < 4; i++) {
+    uint16_t distance = abs(brick_center - anchors[i]) * 2;
+    if (distance > 100) distance = 100;
+    duty_cycles[i] = 100 - distance;
+  }
 }
 
 void display_score() {
