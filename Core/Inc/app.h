@@ -131,6 +131,9 @@ void place_brick(void);
 /** Display the bricks on the LCD page 3 through 7. */
 void display_bricks(void);
 
+/** Display the score on the top center of the LCD. */
+void display_score(void);
+
 /** Blank the LCD and show "PAUSED" on the display and wait for unpause. */
 void pause_game(void);
 

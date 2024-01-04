@@ -1,6 +1,7 @@
 #include "app.h"
 
 #include "Res/font_arialblack.h"
+#include "Res/font_lucidaconsole.h"
 #include "Res/glcd_images.h"
 #include "glcd.h"
 #include "graphics.h"
@@ -117,6 +118,7 @@ void loop() {
     switch (await_button(BTN_ANY, move_brick, NULL)) {
     case BTN_JOY:
       place_brick();
+      display_score();
       break;
     case BTN_KEY:
       pause_game();
@@ -228,9 +230,9 @@ void place_brick() {
   // They have the same width, so we only have to check the position.
   Brick *last_brick = current_brick + 1;
   int16_t current_start = current_brick->position,
-         current_end = current_start + current_brick->width,
-         last_start = last_brick->position,
-         last_end = last_start + last_brick->width;
+          current_end = current_start + current_brick->width,
+          last_start = last_brick->position,
+          last_end = last_start + last_brick->width;
 
   debug_printf("Current: %d - %d, Last: %d - %d\r\n", current_start, current_end, last_start, last_end);
 
@@ -326,6 +328,25 @@ void display_bricks() {
 #else
   glcd_refresh();
 #endif
+}
+
+void display_score() {
+  // Clear the score area
+  static bounding_box_t last_score_box = {0}; // The last score box drawn
+  for (uint8_t x = last_score_box.x1; x <= last_score_box.x2; x++) {
+    for (uint8_t y = last_score_box.y1; y <= last_score_box.y2; y++) {
+      glcd_pixel(x, y, 0);
+    }
+  }
+
+  char string[4];
+  snprintf(string, 4, "%03u", score);
+  const unsigned char *font = ArialBlack12;
+  unsigned char spacing = 8;
+  unsigned char x = (SCREEN_WIDTH - text_width(string, font, spacing)) / 2;
+  last_score_box = draw_text(string, x, 0, font, spacing);
+
+  glcd_refresh();
 }
 
 void pause_game() {
