@@ -227,10 +227,12 @@ void place_brick() {
   // Cut the brick to fit above the last brick.
   // They have the same width, so we only have to check the position.
   Brick *last_brick = current_brick + 1;
-  int8_t current_start = current_brick->position,
+  int16_t current_start = current_brick->position,
          current_end = current_start + current_brick->width,
          last_start = last_brick->position,
          last_end = last_start + last_brick->width;
+
+  debug_printf("Current: %d - %d, Last: %d - %d\r\n", current_start, current_end, last_start, last_end);
 
   if (current_end <= last_start || current_start >= last_end) {
     // Did not overlap with the last brick
