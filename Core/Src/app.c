@@ -26,11 +26,15 @@ GameButtonInfo button_info[BTN_ANY];       // Info used by await button()
 Brick bricks[5];                           // [0] is the moving brick, while [4] is the bottom most brick
 Brick *current_brick = &bricks[3];         // Current (moving) brick is 1 page above the last brick
 BrickDirection brick_direction = TO_RIGHT; // First brick enters from the left of the display
-bool tick = true;                          // Game tick toggled by TIM7
+bool game_tick = true;                     // Game tick toggled by TIM7
+bool needs_refresh = true;                 // Display refresh tick toggled by TIM10
 
 volatile GameButton button_pressed = BTN_NONE;
 
 void setup() {
+#if FPS
+  HAL_TIM_Base_Start_IT(&htim2);
+#endif
   HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -136,20 +140,38 @@ void loop() {
   reset_game();
 }
 
+// This function turns on LED1 if DEBUG is true.
+void on_tim2() {
+#if FPS
+  const int frame_time = (1000 + FPS / 2) / FPS; // rounded to the nearest integer
+  static int counter = 0;
+
+  if (counter < frame_time) {
+    counter++;
+    return;
+  }
+
+  // Only reset the counter when the display is refreshed
+  if (needs_refresh) {
+    glcd_refresh();
+    needs_refresh = false;
+    counter = 0;
+  }
+#endif
+}
+
 // This function turns on LED2 if DEBUG is true.
-// Interval: 250ms
 void on_tim6() {
 }
 
 // This function turns on LED3 if DEBUG is true.
-// Interval: 50us
 void on_tim7() {
   static int counter = 0;
   int tick_interval = 512 - difficulty * 2;
   if (tick_interval < 0) tick_interval = 0;
 
   if (counter >= tick_interval) {
-    tick = true;
+    game_tick = true;
     counter = 0;
   }
   counter++;
@@ -177,7 +199,7 @@ void draw_gauge_needle() {
 }
 
 void move_brick() {
-  if (!tick) return;
+  if (!game_tick) return;
 
   if (current_brick->position >= SCREEN_WIDTH - 1) {
     brick_direction = TO_LEFT;
@@ -198,7 +220,7 @@ void move_brick() {
   );
 
   display_bricks();
-  tick = false;
+  game_tick = false;
 }
 
 void place_brick() {
@@ -251,6 +273,10 @@ void place_brick() {
 }
 
 void display_bricks() {
+#if FPS
+  if (needs_refresh) return; // Wait for display refresh
+#endif
+
   for (uint8_t i = 0; i < 5; i++) {
     uint8_t page = i + 3, start, end;
 
@@ -292,7 +318,12 @@ void display_bricks() {
   }
 
   debug_printf("\r\n");
+
+#if FPS
+  needs_refresh = true;
+#else
   glcd_refresh();
+#endif
 }
 
 void pause_game() {
@@ -311,7 +342,7 @@ void reset_game(void) {
   game_over = false;
   score = 0;
   brick_direction = TO_RIGHT;
-  tick = true;
+  game_tick = true;
 
   for (int i = 0; i < 5; i++) {
     bricks[i] = (Brick) {0};

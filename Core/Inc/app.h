@@ -10,8 +10,16 @@
 // Configuration
 
 #define DEBUG false
+
+/** Limit LCD refresh rate.
+ *  Use 0 to disable frame limiting and get a playable experience.
+ *  Use a low number like 5 to counter the slow LCD response time.
+ */
+#define FPS 0
+
 /** Starting brick is 3/4 of the screen width */
 #define DEFAULT_BRICK_WIDTH (SCREEN_WIDTH * 3 / 4)
+
 /** Starting brick is in the middle of the screen */
 #define DEFAULT_BRICK_POSITION ((SCREEN_WIDTH - DEFAULT_BRICK_WIDTH) / 2)
 
@@ -73,9 +81,17 @@ void setup(void);
 void loop(void);
 
 /**
+ * @brief TIM2 Global Interrupt Service Routine
+ *
+ * This function runs every 1ms.
+ * @see MX_TIM2_Init()
+ */
+void on_tim2(void);
+
+/**
  * @brief TIM6 Global Interrupt Service Routine
  *
- * This function runs every `htim6.Init.Period / 10` milliseconds.
+ * This function runs every 250ms.
  * @see MX_TIM6_Init()
  */
 void on_tim6(void);
@@ -83,7 +99,7 @@ void on_tim6(void);
 /**
  * @brief TIM7 Global Interrupt Service Routine
  *
- * This function runs every `htim7.Init.Period` microseconds.
+ * This function runs every 50us.
  * @see MX_TIM7_Init()
  */
 void on_tim7(void);
@@ -158,6 +174,6 @@ GameButton await_button(GameButton target, void (*task)());
 
 extern UART_HandleTypeDef huart1;
 extern ADC_HandleTypeDef hadc1;
-extern TIM_HandleTypeDef htim6, htim7;
+extern TIM_HandleTypeDef htim2, htim6, htim7;
 
 #endif // !APP_H
