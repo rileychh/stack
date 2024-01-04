@@ -162,13 +162,21 @@ int centered_puts(const char *s, uint8_t width);
 void centered_draw_text(char *string, const unsigned char *font, unsigned char spacing);
 
 /**
- * Detect for button presses by resetting a global variable, and wait for changes from the ISR.
- * The function will return when the button is released.
- * @param target The button to wait for. Use BTN_ANY to detect multiple buttons.
- * @param task Task to do while waiting for button press. This won't be called when waiting for release.
- * @return The button pressed.
+ * Waits for button presses and handles button states.
+ * It resets a global variable and listens for changes from the ISR.
+ * The function will return the identifier of the button when it is released.
+ * Pass NULL to any function pointer to skip that function.
+ *
+ * @param target The button to wait for. Use BTN_ANY to wait for any button press, useful when listening to multiple buttons.
+ * @param while_wait Function pointer to a task performed while waiting for a button press.
+ * @param while_hold Function pointer to a task performed while a button is held down. Takes the pressed button as an argument.
+ * @return The identifier of the button that was pressed and released.
  */
-GameButton await_button(GameButton target, void (*task)());
+GameButton await_button(
+  GameButton target,
+  void (*while_wait)(),
+  void (*while_hold)(GameButton pressed)
+);
 
 // Globals
 

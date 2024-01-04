@@ -60,7 +60,7 @@ void loop() {
     glcd_page(page, SPLASH_SCREEN + offset);
   }
   glcd_refresh();
-  await_button(BTN_KEY, NULL);
+  await_button(BTN_KEY, NULL, NULL);
   glcd_blank();
 
   puts("");
@@ -71,7 +71,7 @@ void loop() {
   // Display the speed gauge UI on the LCD
   glcd_page(4, SPEED_GAUGE + 128); // The "V [key]" prompt
   glcd_refresh();
-  await_button(BTN_KEY, draw_gauge_needle);
+  await_button(BTN_KEY, draw_gauge_needle, NULL);
   glcd_blank();
 
   debug_printf("The difficulty is set to %u\r\n", difficulty);
@@ -114,7 +114,7 @@ void loop() {
       current_brick->position
     );
 
-    switch (await_button(BTN_ANY, move_brick)) {
+    switch (await_button(BTN_ANY, move_brick, NULL)) {
     case BTN_JOY:
       place_brick();
       break;
@@ -334,7 +334,7 @@ void pause_game() {
   // Clear the current brick to correct last brick detection
   *current_brick = (Brick) {0};
 
-  await_button(BTN_KEY, NULL);
+  await_button(BTN_KEY, NULL, NULL);
   glcd_blank();
 }
 
@@ -378,10 +378,14 @@ bool is_pressed(GameButton target) {
   return button_pressed == target;
 }
 
-GameButton await_button(GameButton target, void (*task)()) {
+GameButton await_button(
+  GameButton target,
+  void (*while_wait)(),
+  void (*while_hold)(GameButton pressed)
+) {
   do {
     button_pressed = BTN_NONE;
-    if (task) task();
+    if (while_wait) while_wait();
   } while (!is_pressed(target));
 
   debug_printf("Button %u is pressed\r\n", button_pressed);
@@ -389,7 +393,7 @@ GameButton await_button(GameButton target, void (*task)()) {
   GameButtonInfo btn = button_info[button_pressed];
   HAL_Delay(20); // Debounce
   while (HAL_GPIO_ReadPin(btn.port, btn.pin) == btn.active_state) {
-    // Wait for release
+    if (while_hold) while_hold(button_pressed);
   }
   HAL_Delay(20); // Debounce
 
