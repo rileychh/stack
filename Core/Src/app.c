@@ -387,11 +387,11 @@ GameButton await_button(GameButton target, void (*task)()) {
   debug_printf("Button %u is pressed\r\n", button_pressed);
 
   GameButtonInfo btn = button_info[button_pressed];
-  HAL_Delay(50); // Debounce
+  HAL_Delay(20); // Debounce
   while (HAL_GPIO_ReadPin(btn.port, btn.pin) == btn.active_state) {
     // Wait for release
   }
-  HAL_Delay(50); // Debounce
+  HAL_Delay(20); // Debounce
 
   return button_pressed;
 }
