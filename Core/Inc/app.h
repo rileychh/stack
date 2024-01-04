@@ -28,7 +28,7 @@
 #define debug_printf(...) printf(__VA_ARGS__)
 #else
 /** printf that only activates in debug. */
-#define debug_printf(...)
+#define debug_printf(...) ((void)0)
 #endif
 
 /** UART console width for centering text. */
