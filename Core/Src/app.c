@@ -86,7 +86,7 @@ void loop() {
       glcd_blank();
 
       draw_text(title, title_x, 0, font, spacing);
-      snprintf(high_score_string, 16, "%03u BY %8s", high_score.score, high_score.name);
+      snprintf(high_score_string, 16, "%03u by %8s", high_score.score, high_score.name);
       centered_draw_text(high_score_string, LucidaConsole10_Bold, 0);
       glcd_refresh();
 
@@ -180,21 +180,26 @@ EXIT_TITLE:
     score > 10 ? "Good Job!" : "\r\nTip: you have to look at the display to get a high score."
   );
 
+  puts("");
+  glcd_blank();
   if (score >= high_score.score) {
-    centered_draw_text("NEW HIGH SCORE!", ArialBlack16, 8);
+    centered_draw_text("HIGH SCORE!", ArialBlack14, 1);
+    glcd_refresh();
 
-    centered_puts("You beat the high score!", CONSOLE_WIDTH);
-    puts("Enter your name (up to 8 characters):");
+    centered_puts("YOU BEAT THE HIGH SCORE!", CONSOLE_WIDTH);
+    puts("Enter your name (up to 8 characters) and press Enter on keyboard.");
     static char name[9];
     scanf("%8s", name);
     for (int i = 0; name[i]; i++) name[i] = toupper(name[i]); // Convert to uppercase
     high_score.name = name;
     high_score.score = score;
   } else {
-    centered_draw_text("GAME OVER", ArialBlack16, 16);
+    centered_draw_text("GAME OVER", ArialBlack14, 1);
+    glcd_refresh();
+    puts("Press any button to return to the title screen");
+    await_button(BTN_ANY, NULL, NULL);
   }
 
-  // Reset game state
   reset_game();
 }
 
