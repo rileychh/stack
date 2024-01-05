@@ -180,13 +180,13 @@ void centered_draw_text(char *string, const unsigned char *font, unsigned char s
  *
  * @param target The button to wait for. Use BTN_ANY to wait for any button press, useful when listening to multiple buttons.
  * @param while_wait Function pointer to a task performed while waiting for a button press.
- * @param while_hold Function pointer to a task performed while a button is held down. Takes the pressed button as an argument.
+ * @param while_hold Function pointer to a task performed while a button is held down.
  * @return The identifier of the button that was pressed and released.
  */
 GameButton await_button(
   GameButton target,
   void (*while_wait)(),
-  void (*while_hold)(GameButton pressed)
+  void (*while_hold)()
 );
 
 /** Flash the LED crazily like a betel nut stand. */

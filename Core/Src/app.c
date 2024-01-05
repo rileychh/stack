@@ -518,7 +518,7 @@ bool is_pressed(GameButton target) {
 GameButton await_button(
   GameButton target,
   void (*while_wait)(),
-  void (*while_hold)(GameButton pressed)
+  void (*while_hold)()
 ) {
   do {
     button_pressed = BTN_NONE;
@@ -530,7 +530,7 @@ GameButton await_button(
   GameButtonInfo btn = button_info[button_pressed];
   HAL_Delay(20); // Debounce
   while (HAL_GPIO_ReadPin(btn.port, btn.pin) == btn.active_state) {
-    if (while_hold) while_hold(button_pressed);
+    if (while_hold) while_hold();
   }
   HAL_Delay(20); // Debounce
 
@@ -599,7 +599,7 @@ void led_betel_nut_stand() {
   }
 }
 
-void led_breathe(void) {
+void led_breathe() {
   static uint8_t brightness = 0;
   static bool is_increasing = true;
 
