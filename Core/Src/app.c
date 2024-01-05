@@ -68,7 +68,7 @@ void loop() {
   centered_puts("Press [Joy] to view the high score", CONSOLE_WIDTH);
 
   while (true) {
-    for (uint8_t page = 0; page < 8; page++) {
+    for (int page = 0; page < 8; page++) {
       uint16_t offset = page * 128;
       glcd_page(page, SPLASH_SCREEN + offset);
     }
@@ -117,7 +117,7 @@ EXIT_TITLE:
   puts("[Joy]\tPlace a brick onto the stack");
   puts("[Key]\tPause the game");
   char *countdown[] = {"3", "2", "1", "GO", NULL};
-  for (uint8_t i = 0; countdown[i] != NULL; i++) {
+  for (int i = 0; countdown[i] != NULL; i++) {
     centered_draw_text(countdown[i], ArialBlack16, 0);
     glcd_refresh();
 
@@ -136,7 +136,7 @@ EXIT_TITLE:
   do {
     // Find where the last brick is from top to bottom
     Brick *last_brick = &bricks[4]; // Default to the bottom
-    for (uint8_t i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; i++) {
       if (bricks[i].width != 0) {
         last_brick = &bricks[i];
         break;
@@ -373,7 +373,7 @@ void display_bricks() {
   if (needs_refresh) return; // Wait for display refresh
 #endif
 
-  for (uint8_t i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++) {
     uint8_t page = i + 3, start, end;
 
     // Skip zero-width bricks
@@ -401,7 +401,7 @@ void display_bricks() {
     static unsigned char empty_page[SCREEN_WIDTH] = {0};
     glcd_page(page, empty_page);
 
-    for (uint8_t column = start; column <= end; column++) {
+    for (int column = start; column <= end; column++) {
       uint8_t data;
       if (
 #if !FPS // frame-limited mode doesn't need to worry about the response time
@@ -438,8 +438,8 @@ void display_bricks() {
 
 void display_score() {
   // Clear the score area
-  for (uint8_t x = score_box.x1; x <= score_box.x2; x++) {
-    for (uint8_t y = score_box.y1; y <= score_box.y2; y++) {
+  for (int x = score_box.x1; x <= score_box.x2; x++) {
+    for (int y = score_box.y1; y <= score_box.y2; y++) {
       glcd_pixel(x, y, 0);
     }
   }
