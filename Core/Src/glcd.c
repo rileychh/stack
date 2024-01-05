@@ -24,7 +24,6 @@ void glcd_pixel(unsigned char x, unsigned char y, unsigned char colour) {
   unsigned short array_pos = x + ((y / 8) * 128);
 
 #ifdef ST7565_DIRTY_PAGES
-#warning ** ST7565_DIRTY_PAGES enabled, only changed pages will be written to the GLCD **
   glcd_dirty_pages |= 1 << (array_pos / 128);
 #endif
 
@@ -41,7 +40,6 @@ void glcd_column(unsigned char page, unsigned char column, unsigned char colours
   unsigned short array_pos = page * 128 + column;
 
 #ifdef ST7565_DIRTY_PAGES
-#warning ** ST7565_DIRTY_PAGES enabled, only changed pages will be written to the GLCD **
   glcd_dirty_pages |= 1 << page;
 #endif
 
