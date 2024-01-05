@@ -328,9 +328,14 @@ void display_bricks() {
     for (uint8_t column = start; column <= end; column++) {
       uint8_t data;
       if (
-        !is_left_oob && column == start ||
-        !is_right_oob && column == end
-      ) data = 0xff;                    // left and right border
+#if !FPS // frame-limited mode don't need to worry about the response time
+        // display brick in black for visibility
+        &bricks[i] == current_brick && current_brick->width < 16 ||
+#endif
+        !is_left_oob && column == start || // left border
+        !is_right_oob && column == end     // right border
+      )
+        data = 0xff;
       else if (column % 2) data = 0xab; // 0xaa but with bottom border
       else data = 0xd5;                 // 0x55 but with top border
       glcd_column(page, column, data);
