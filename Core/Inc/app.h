@@ -52,6 +52,14 @@ typedef enum {
   TO_LEFT,
 } BrickDirection;
 
+/** Represents a high score record. */
+typedef struct {
+  /** The score record. */
+  uint16_t score;
+  /** The name of the record breaker. Must be static and less than 8 characters. */
+  char *name;
+} HighScore;
+
 /** Represents a button, no button, or any button.
  *  Used by the await_button function.
  */

@@ -8,6 +8,7 @@
 #include "main.h"
 #include "uart_stdio.h"
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,7 @@ GameButtonInfo button_info[BTN_ANY];       // Info used by await button()
 Brick bricks[5];                           // [0] is the moving brick, while [4] is the bottom most brick
 Brick *current_brick = &bricks[3];         // Current (moving) brick is 1 page above the last brick
 BrickDirection brick_direction = TO_RIGHT; // First brick enters from the left of the display
+HighScore high_score = {0};                // The highest score achieved
 bool game_tick = true;                     // Game tick toggled by TIM7
 bool needs_refresh = true;                 // Display refresh tick toggled by TIM10
 uint8_t duty_cycles[4] = {0};              // PWM duty cycles for the LEDs
@@ -52,18 +54,48 @@ void setup() {
   button_info[BTN_JOY].pin = JOY_SEL_Pin;
   button_info[BTN_JOY].active_state = GPIO_PIN_RESET;
 
+  // Set a easy-to-beat high score
+  high_score.name = "RILEY";
+  high_score.score = 10;
+
   reset_game();
 }
 
 void loop() {
   puts(GAME_BANNER);
   centered_puts("Press [Key] to start the game", CONSOLE_WIDTH);
-  for (uint8_t page = 0; page < 8; page++) {
-    uint16_t offset = page * 128;
-    glcd_page(page, SPLASH_SCREEN + offset);
+  centered_puts("Press [Joy] to view the high score", CONSOLE_WIDTH);
+
+  while (true) {
+    for (uint8_t page = 0; page < 8; page++) {
+      uint16_t offset = page * 128;
+      glcd_page(page, SPLASH_SCREEN + offset);
+    }
+    glcd_refresh();
+
+    char *title = "HIGH SCORE";
+    uint8_t spacing = 4;
+    const unsigned char *font = ArialBlack12;
+    uint8_t title_x = (SCREEN_WIDTH - text_width(title, font, spacing)) / 2;
+    char high_score_string[16];
+
+    switch (await_button(BTN_ANY, NULL, NULL)) {
+    case BTN_KEY: goto EXIT_TITLE;
+    case BTN_JOY:
+      glcd_blank();
+
+      draw_text(title, title_x, 0, font, spacing);
+      snprintf(high_score_string, 16, "%03u BY %8s", high_score.score, high_score.name);
+      centered_draw_text(high_score_string, LucidaConsole10_Bold, 0);
+      glcd_refresh();
+
+      printf("High score: %s\r\n", high_score_string);
+      puts("Press any button to return to the title screen");
+      await_button(BTN_ANY, NULL, NULL);
+    default: break;
+    }
   }
-  glcd_refresh();
-  await_button(BTN_KEY, NULL, NULL);
+EXIT_TITLE:
   glcd_blank();
 
   puts("");
@@ -138,7 +170,19 @@ void loop() {
     score > 10 ? "Good Job!" : "\r\nTip: you have to look at the display to get a high score."
   );
 
-  // TODO Leaderboard
+  if (score >= high_score.score) {
+    centered_draw_text("NEW HIGH SCORE!", ArialBlack16, 8);
+
+    centered_puts("You beat the high score!", CONSOLE_WIDTH);
+    puts("Enter your name (up to 8 characters):");
+    static char name[9];
+    scanf("%8s", name);
+    for (int i = 0; name[i]; i++) name[i] = toupper(name[i]); // Convert to uppercase
+    high_score.name = name;
+    high_score.score = score;
+  } else {
+    centered_draw_text("GAME OVER", ArialBlack16, 16);
+  }
 
   // Reset game state
   reset_game();
