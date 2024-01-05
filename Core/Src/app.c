@@ -68,8 +68,8 @@ void loop() {
 
   puts("");
   centered_puts("DIFFICULTY SELECTION", CONSOLE_WIDTH);
-  puts("[Arrow] Adjust the starting difficulty");
-  puts("[Key] Confirm and start the game");
+  puts("[Arrow]\tAdjust the starting difficulty");
+  puts("[Key]\tConfirm and start the game");
 
   // Display the speed gauge UI on the LCD
   glcd_page(4, SPEED_GAUGE + 128); // The "V [key]" prompt
@@ -81,8 +81,8 @@ void loop() {
 
   puts("");
   centered_puts("GAME START", CONSOLE_WIDTH);
-  puts("[Joy] Place a brick onto the stack");
-  puts("[Key] Pause the game");
+  puts("[Joy]\tPlace a brick onto the stack");
+  puts("[Key]\tPause the game");
   char *countdown[] = {"3", "2", "1", "GO", NULL};
   for (uint8_t i = 0; countdown[i] != NULL; i++) {
     centered_draw_text(countdown[i], ArialBlack16, 0);
@@ -380,6 +380,10 @@ void display_score() {
 }
 
 void pause_game() {
+  centered_puts("GAME PAUSED", CONSOLE_WIDTH);
+  printf("Score: %u\r\n", score);
+  puts("[Key]\tResume the game");
+
   glcd_blank();
   centered_draw_text("PAUSED", ArialBlack16, 4);
   glcd_refresh();
