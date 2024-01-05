@@ -195,6 +195,11 @@ void led_betel_nut_stand(void);
 /** Flash the LED like a heartbeat. */
 void led_breathe(void);
 
+/** Flash the LED in the check pattern (like waving a checkered flag).
+ *  Plays the whole animation in one call, therefore the blocking suffix.
+ */
+void led_checkered_blocking(void);
+
 // Globals
 
 extern UART_HandleTypeDef huart1;

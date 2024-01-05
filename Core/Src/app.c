@@ -119,6 +119,15 @@ EXIT_TITLE:
   for (uint8_t i = 0; countdown[i] != NULL; i++) {
     centered_draw_text(countdown[i], ArialBlack16, 0);
     glcd_refresh();
+
+    if (i == 3) {
+      led_checkered_blocking();
+    } else {
+      for (int j = 0; j < 4; j++) {
+        duty_cycles[j] = 25 * i;
+      }
+    }
+
     HAL_Delay(1000);
     glcd_blank();
   }
@@ -594,4 +603,15 @@ void led_breathe(void) {
     duty_cycles[i] = brightness;
   }
   HAL_Delay(10);
+}
+
+void led_checkered_blocking(void) {
+  uint8_t led_states = 0x5;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      duty_cycles[j] = led_states & (0x01 << j) ? 100 : 0;
+    }
+    led_states = ~led_states;
+    HAL_Delay(250);
+  }
 }
