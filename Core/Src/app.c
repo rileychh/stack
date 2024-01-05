@@ -30,6 +30,7 @@ Brick bricks[5];                           // [0] is the moving brick, while [4]
 Brick *current_brick = &bricks[3];         // Current (moving) brick is 1 page above the last brick
 BrickDirection brick_direction = TO_RIGHT; // First brick enters from the left of the display
 HighScore high_score = {0};                // The highest score achieved
+bounding_box_t score_box = {0};            // The bounding box of the score drawn on the LCD
 bool game_tick = true;                     // Game tick toggled by TIM7
 bool needs_refresh = true;                 // Display refresh tick toggled by TIM10
 uint8_t duty_cycles[4] = {0};              // PWM duty cycles for the LEDs
@@ -56,7 +57,7 @@ void setup() {
 
   // Set an easy-to-beat high score
   high_score.name = "RILEY";
-  high_score.score = 10;
+  high_score.score = 5;
 
   reset_game();
 }
@@ -330,6 +331,17 @@ void place_brick() {
     puts("PERFECT placement!");
     score++; // Get an extra point
 
+    // Flash the LEDs and the score box twice
+    const uint8_t animation[] = {100, 0, 100, 0};
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        duty_cycles[j] = animation[i];
+        draw_rectangle(score_box.x1 - j - 2, score_box.y1 - j - 1, score_box.x2 + j + 2, score_box.y2 + j - 2, animation[i]);
+      }
+      glcd_refresh();
+      HAL_Delay(250);
+    }
+
     // Grow the current brick
     current_brick->position--;
     current_brick->width += 2;
@@ -421,9 +433,8 @@ void display_bricks() {
 
 void display_score() {
   // Clear the score area
-  static bounding_box_t last_score_box = {0}; // The last score box drawn
-  for (uint8_t x = last_score_box.x1; x <= last_score_box.x2; x++) {
-    for (uint8_t y = last_score_box.y1; y <= last_score_box.y2; y++) {
+  for (uint8_t x = score_box.x1; x <= score_box.x2; x++) {
+    for (uint8_t y = score_box.y1; y <= score_box.y2; y++) {
       glcd_pixel(x, y, 0);
     }
   }
@@ -433,7 +444,8 @@ void display_score() {
   const unsigned char *font = ArialBlack12;
   unsigned char spacing = 8;
   unsigned char x = (SCREEN_WIDTH - text_width(string, font, spacing)) / 2;
-  last_score_box = draw_text(string, x, 0, font, spacing);
+  unsigned char y = 4; // Leave 4px of space for the perfect placement box
+  score_box = draw_text(string, x, y, font, spacing);
 
   glcd_refresh();
 }
