@@ -107,7 +107,7 @@ void loop() {
     // Spawn a new brick
     current_brick->width = last_brick->width;
     if (brick_direction == TO_RIGHT) {
-      current_brick->position = 1 - current_brick->width;
+      current_brick->position = (int8_t)(1 - current_brick->width);
     } else { // TO_LEFT
       current_brick->position = SCREEN_WIDTH - 1;
     }
@@ -245,10 +245,10 @@ void place_brick() {
   // Cut the brick to fit above the last brick.
   // They have the same width, so we only have to check the position.
   Brick *last_brick = current_brick + 1;
-  int16_t current_start = current_brick->position,
-          current_end = current_start + current_brick->width,
-          last_start = last_brick->position,
-          last_end = last_start + last_brick->width;
+  int8_t current_start = current_brick->position;
+  int16_t current_end = (int16_t)(current_start + current_brick->width);
+  int8_t last_start = last_brick->position;
+  int16_t last_end = (int16_t)(last_start + last_brick->width);
 
   debug_printf("Current: %d - %d, Last: %d - %d\r\n", current_start, current_end, last_start, last_end);
 
@@ -351,7 +351,7 @@ void display_bricks() {
 #endif
 
   // Sync the LEDs to the position of the brick
-  int16_t brick_center = current_brick->position + current_brick->width / 2;
+  int16_t brick_center = (int16_t)(current_brick->position + current_brick->width / 2);
   uint8_t anchors[4] = {127, 96, 63, 0};
   for (int i = 0; i < 4; i++) {
     uint16_t distance = abs(brick_center - anchors[i]) * 2;
