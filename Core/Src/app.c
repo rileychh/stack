@@ -386,6 +386,11 @@ void display_score() {
 }
 
 void pause_game() {
+  // Turn off all LEDs
+  for (int i = 0; i < 4; i++) {
+    duty_cycles[i] = 0;
+  }
+
   centered_puts("GAME PAUSED", CONSOLE_WIDTH);
   printf("Score: %u\r\n", score);
   puts("[Key]\tResume the game");
@@ -406,6 +411,10 @@ void reset_game(void) {
   score = 0;
   brick_direction = TO_RIGHT;
   game_tick = true;
+
+  for (int i = 0; i < 4; i++) {
+    duty_cycles[i] = 0;
+  }
 
   for (int i = 0; i < 5; i++) {
     bricks[i] = (Brick) {0};
