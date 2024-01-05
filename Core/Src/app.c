@@ -54,7 +54,7 @@ void setup() {
   button_info[BTN_JOY].pin = JOY_SEL_Pin;
   button_info[BTN_JOY].active_state = GPIO_PIN_RESET;
 
-  // Set a easy-to-beat high score
+  // Set an easy-to-beat high score
   high_score.name = "RILEY";
   high_score.score = 10;
 
@@ -378,7 +378,7 @@ void display_bricks() {
     for (uint8_t column = start; column <= end; column++) {
       uint8_t data;
       if (
-#if !FPS // frame-limited mode don't need to worry about the response time
+#if !FPS // frame-limited mode doesn't need to worry about the response time
         // display brick in black for visibility
         &bricks[i] == current_brick && current_brick->width < 16 ||
 #endif
