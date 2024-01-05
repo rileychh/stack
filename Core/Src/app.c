@@ -79,7 +79,7 @@ void loop() {
     uint8_t title_x = (SCREEN_WIDTH - text_width(title, font, spacing)) / 2;
     char high_score_string[16];
 
-    switch (await_button(BTN_ANY, NULL, NULL)) {
+    switch (await_button(BTN_ANY, led_betel_nut_stand, NULL)) {
     case BTN_KEY: goto EXIT_TITLE;
     case BTN_JOY:
       glcd_blank();
@@ -91,7 +91,7 @@ void loop() {
 
       printf("High score: %s\r\n", high_score_string);
       puts("Press any button to return to the title screen");
-      await_button(BTN_ANY, NULL, NULL);
+      await_button(BTN_ANY, led_breathe, NULL);
     default: break;
     }
   }
@@ -514,4 +514,84 @@ GameButton await_button(
   HAL_Delay(20); // Debounce
 
   return button_pressed;
+}
+
+void led_betel_nut_stand() {
+  // Animations: [0] is animation length, [1] is delay between frames in milliseconds,
+  // each byte after is 2 frames for the 4 LEDs.
+  const uint8_t flash[] = {2, 50, 0x0f};
+  const uint8_t stack_from_left[] = {11, 75, 0x01, 0x24, 0x89, 0xac, 0xde, 0xf0};
+  const uint8_t stack_from_right[] = {11, 75, 0x84, 0x42, 0x19, 0x53, 0xb7, 0xf0};
+  const uint8_t grow_from_left[] = {4, 100, 0x8c, 0xef};
+  const uint8_t grow_from_right[] = {4, 100, 0x13, 0x7f};
+
+  const uint8_t *sequence[] = {
+    flash,
+    flash,
+    flash,
+    flash,
+    stack_from_left,
+    stack_from_right,
+    flash,
+    flash,
+    flash,
+    flash,
+    grow_from_left,
+    grow_from_right,
+    grow_from_left,
+    grow_from_right,
+    NULL
+  };
+
+  // We want this function to return ASAP to avoid delaying interrupts,
+  // So we track the animation in static variables and return every frame.
+  static uint8_t animation_index = 0; // Index of the current animation in the sequence
+  static uint8_t frame_count = 0;     // Number of frames in the current animation
+  static uint8_t animation_delay = 0; // Delay between frames in milliseconds
+  static uint8_t frame = 0;           // Current frame
+
+  // Start over when the sequence ends
+  if (sequence[animation_index] == NULL) {
+    animation_index = 0;
+    frame_count = sequence[animation_index][0];
+    animation_delay = sequence[animation_index][1];
+    frame = 0;
+  }
+
+  if (frame < frame_count) {
+    // Extract a nibble representing the 4 LED states from the byte array
+    uint8_t two_frames = sequence[animation_index][2 + frame / 2];
+    uint8_t led_states = frame % 2 ? two_frames & 0x0f : two_frames >> 4;
+
+    // Set each LED to on (100) or off (0)
+    for (int i = 0; i < 4; i++) {
+      duty_cycles[i] = led_states & (0x01 << i) ? 100 : 0;
+    }
+    HAL_Delay(animation_delay);
+    frame++;
+  } else {
+    // Move on to the next animation
+    animation_index++;
+    frame_count = sequence[animation_index][0];
+    animation_delay = sequence[animation_index][1];
+    frame = 0;
+  }
+}
+
+void led_breathe(void) {
+  static uint8_t brightness = 0;
+  static bool is_increasing = true;
+
+  if (is_increasing) {
+    if (brightness < 100) brightness++;
+    else is_increasing = false;
+  } else {
+    if (brightness > 0) brightness--;
+    else is_increasing = true;
+  }
+
+  for (int i = 0; i < 4; i++) {
+    duty_cycles[i] = brightness;
+  }
+  HAL_Delay(10);
 }

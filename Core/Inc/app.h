@@ -189,6 +189,12 @@ GameButton await_button(
   void (*while_hold)(GameButton pressed)
 );
 
+/** Flash the LED crazily like a betel nut stand. */
+void led_betel_nut_stand(void);
+
+/** Flash the LED like a heartbeat. */
+void led_breathe(void);
+
 // Globals
 
 extern UART_HandleTypeDef huart1;
