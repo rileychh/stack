@@ -159,7 +159,7 @@ EXIT_TITLE:
       current_brick->position
     );
 
-    switch (await_button(BTN_ANY, move_brick, NULL)) {
+    switch (await_button(BTN_ANY, move_brick, led_on)) {
     case BTN_JOY:
       place_brick();
       display_score();
@@ -617,7 +617,15 @@ void led_breathe() {
   HAL_Delay(10);
 }
 
-void led_checkered_blocking(void) {
+void led_on() {
+  if (button_pressed == BTN_JOY) {
+    for (int i = 0; i < 4; i++) {
+      duty_cycles[i] = 100;
+    }
+  }
+}
+
+void led_checkered_blocking() {
   uint8_t led_states = 0x5;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
