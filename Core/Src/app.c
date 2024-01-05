@@ -214,6 +214,12 @@ void draw_gauge_needle() {
     glcd_column(3, column, 0xff);
   }
   glcd_refresh();
+
+  // Sync the brightness of the LEDs to the position of the needle
+  uint8_t brightness = difficulty > 100 ? 100 : difficulty;
+  for (int i = 0; i < 4; i++) {
+    duty_cycles[i] = brightness;
+  }
 }
 
 void move_brick() {
