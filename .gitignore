@@ -4,7 +4,7 @@
 !/.idea/tools/
 !/.idea/customTargets.xml
 !/.idea/cmake.xml
-/cmake-build-debug-stm32/
+/cmake-build-*/
 /CMakeLists.txt
 /CMakeLists_template.txt
 
